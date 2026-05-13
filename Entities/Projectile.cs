@@ -16,16 +16,22 @@ namespace SuperTanks.Entities
     internal class Projectile : GameObject
     {
         private Direction _direction;
-        private float _rotation;
-        private float _speed = 800f;
+        private float _speed = 500f;
         private Team _owner;
+        private float _rotation;
         private static int _damage = 10;
+
+        private bool _visible = false;
+        private float _ownerCoordinate;
 
         internal Team GetTeam() {  return _owner; }
         internal Direction GetDirection() { return _direction; }
-        public Projectile(Texture2D currentImg, Vector2 vector, int sizeX, int sizeY, bool blocking, bool shootable, Direction direction, Team owner, int damage) : base(currentImg, vector, sizeX, sizeY, blocking, shootable)
+        public Projectile(Texture2D currentImg, Vector2 vector, int sizeX, int sizeY, bool blocking, bool shootable, Direction direction, Team owner, float coordinate) : base(currentImg, vector, sizeX, sizeY, blocking, shootable)
         {
             this._direction = direction;
+            _owner = owner;
+            _ownerCoordinate = coordinate;
+
             switch (direction)
             {
                 case Direction.Up:
@@ -44,9 +50,6 @@ namespace SuperTanks.Entities
                     _rotation = MathHelper.ToRadians(270f);
                     break;
             }
-
-            _owner = owner;
-            _damage = damage;
         }
 
         internal bool SizeReduction(Vector2 newPosition, int reduction)
@@ -123,20 +126,62 @@ namespace SuperTanks.Entities
 
         internal override void Draw(Renderer renderer)
         {
-            Texture2D tex = base.GetCurrentImg();
-            Vector2 scale;
-
-            if (_direction == Direction.Up || _direction == Direction.Down)
+            if (_visible)
             {
-                scale.X = GetSizeX() / (float)tex.Width;
-                scale.Y = GetSizeY() / (float)tex.Height;
+                Texture2D tex = base.GetCurrentImg();
+                Vector2 scale;
+
+                if (_direction == Direction.Up || _direction == Direction.Down)
+                {
+                    scale.X = GetSizeX() / (float)tex.Width;
+                    scale.Y = GetSizeY() / (float)tex.Height;
+                }
+                else
+                {
+                    scale.X = GetSizeY() / (float)tex.Width;
+                    scale.Y = GetSizeX() / (float)tex.Height;
+                }
+                renderer.DrawWithRotationAndScale(tex, this.GetVector(), this.GetSizeX(), this.GetSizeY(), Color.White, _rotation, scale);
             }
             else
             {
-                scale.X = GetSizeY() / (float)tex.Width;
-                scale.Y = GetSizeX() / (float)tex.Height;
+                switch (this._direction)
+                {
+                    case Direction.Left:
+                    {
+                            if (this.Bounds(this.GetVector()).Right - 1 <= _ownerCoordinate)
+                            {
+                                _visible = true;
+                            }
+                            return;
+                     } 
+                    case Direction.Right:
+                    {
+                            if (this.Bounds(this.GetVector()).Left >= _ownerCoordinate)
+                            {
+                                _visible = true;
+                            }
+                            return;
+                     } 
+                    case Direction.Up:
+                    {
+                            if (this.Bounds(this.GetVector()).Bottom -1  <= _ownerCoordinate)
+                            {
+                                _visible = true;
+                            }
+                            return;
+                     } 
+                    case Direction.Down:
+                    {
+                            if (this.Bounds(this.GetVector()).Top >= _ownerCoordinate)
+                            {
+                                _visible = true;
+                            }
+                            return;
+                     } 
+                }
             }
-            renderer.DrawWithRotationAndScale(tex, this.GetVector(), this.GetSizeX(), this.GetSizeY(), Color.White, _rotation, scale);
+
         }
 
         internal static int GetDamage() {  return _damage; }

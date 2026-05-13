@@ -20,9 +20,11 @@ namespace SuperTanks.Systems
         internal static Texture2D _rock;
         internal static Texture2D _eagle;
 
-        internal static Texture2D _projectile;
         internal static Texture2D _testProj;
         internal static Texture2D _gameOver;
+        internal static Texture2D _enemy;
+
+        internal static Texture2D _projectile;
 
         internal static Rectangle[,] Load2D(Texture2D texture, int frameWidth, int frameHeight)
         {

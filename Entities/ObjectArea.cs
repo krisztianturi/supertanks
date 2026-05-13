@@ -4,6 +4,7 @@ using SuperTanks.Core;
 using SuperTanks.Systems;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -54,7 +55,7 @@ namespace SuperTanks.Entities
                                 this.SetVector(new Vector2(this.GetVector().X, this.GetVector().Y+intersect.Height));
                                 newSizeY = this.GetSizeY() - intersect.Height;
                             }
-                            if(newSizeY==0)  new InvalidOperationException("NewSize is 0 !");
+                            if(newSizeY==0)  throw new InvalidOperationException("NewSize is 0 !");
                             this.SetSizeY(newSizeY);
                             return false;
                         }
@@ -75,7 +76,7 @@ namespace SuperTanks.Entities
                                 this.SetVector(new Vector2(this.GetVector().X+ intersect.Width, this.GetVector().Y));
                                 newSizeX = this.GetSizeX() - intersect.Width;
                             }
-                            if (newSizeX == 0) new InvalidOperationException("NewSize is 0 !");
+                            if (newSizeX == 0) throw new InvalidOperationException("NewSize is 0 !");
                             this.SetSizeX(newSizeX);
                             return false;
                         }

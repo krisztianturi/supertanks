@@ -1,11 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SuperTanks.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SuperTanks.Entities
 {
@@ -25,6 +20,7 @@ namespace SuperTanks.Entities
         internal int GetPower() { return _power; }
         internal void SetPower(int power) { _power = power; }
         internal int GetVitality() { return _vitality; }
+        internal void SetVitality(int vitality) {  _vitality = vitality; }
 
     }
 }

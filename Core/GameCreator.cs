@@ -102,6 +102,12 @@ namespace SuperTanks.Core
 
                     if ((x == 0 && y == 0) || (x == _countX - 2 && y == 0))
                     {
+                        Enemy enemy = EntityFactory.CreateEnemy(new Vector2(pixelX, pixelY), 1, 1);
+                        gameObjects.Add(enemy);
+                        _spatialGrid.Add(enemy);
+
+                        pixelX += enemy.GetSizeX();
+                        pixelY += enemy.GetSizeY();
                         continue;
                     }
 

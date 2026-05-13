@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using SuperTanks.Core;
 using SuperTanks.Systems;
+using System;
 
 
 
@@ -12,19 +13,21 @@ namespace SuperTanks.Entities
     {
 
         private float speed = 500f;
-        private double _currentTime, _shootingTime=0;
+        private double _shootingTime=0;
         private static double _holdProjectile = 300;
+
+        private Vector2 _originPosition;
 
         internal Player(Texture2D currentImg, Vector2 vector, int sizeX, int sizeY, bool blocking, bool shootable, int power, int vitality) : base(currentImg, vector, sizeX, sizeY, blocking, shootable, power,vitality)
         {
-           
+           _originPosition = new Vector2(vector.X, vector.Y);
         }
 
         internal override void Update(GameTime gameTime, GameManager gm)
         {
             move(gameTime, gm);
-            _currentTime = gameTime.TotalGameTime.TotalMilliseconds;
-            if (InputManager.IsDown(Keys.Space) && _currentTime > _shootingTime+_holdProjectile)
+            double currentTime = gameTime.TotalGameTime.TotalMilliseconds;
+            if (InputManager.IsDown(Keys.Space) && currentTime > _shootingTime+_holdProjectile)
             {
                 gm.Shooting(this);
                 _shootingTime = gameTime.TotalGameTime.TotalMilliseconds;
@@ -62,6 +65,18 @@ namespace SuperTanks.Entities
             Vector2 movement = velocity * speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             gm.MoveWithClamp(velocity, movement, this);
+        }
+
+        internal void HitHandle(GameManager gm)
+        {
+            if(this.GetVitality() == 1)
+            {
+                gm.SetGameOver();
+                return;
+            }
+            this.SetVector(_originPosition);
+            gm.UpdateObject(this);
+            this.SetVitality(this.GetVitality() -1);
         }
 
         internal override void Draw(Renderer renderer)

@@ -6,6 +6,7 @@ using SuperTanks.Overlays;
 using SuperTanks.Systems;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace SuperTanks.Core
@@ -22,6 +23,7 @@ namespace SuperTanks.Core
 
         private bool _isGameOver = false;
         private readonly int _tileSize = 100;
+
 
         internal static void SetEdges(int left, int right, int top, int bottom)
         {
@@ -82,6 +84,11 @@ namespace SuperTanks.Core
             }
         }
 
+        internal void SetGameOver()
+        {
+            _isGameOver = true;
+        }
+
         private void TheGameIsLost()
         {
             OverlayManager.RequestChange(new GameOverOverlay());
@@ -114,6 +121,9 @@ namespace SuperTanks.Core
             _objects.Add(go);
         }
 
+        internal void RemoveObject(GameObject o) { _toRemove.Add(o); }
+        internal void UpdateObject(GameObject o) { _spatialGrid.Update(o); }
+
         internal void MoveProjectile(Vector2 newPosition, Projectile projectile)
         {
             if (IsCollided(newPosition, projectile))
@@ -123,14 +133,32 @@ namespace SuperTanks.Core
                 {
                     _toRemove.Add(projectile);
                 }
+                else
+                {
+                    _spatialGrid.Update(projectile);
+                }
+            }
+            else if(!IsProjectileOnEdge(newPosition, projectile))
+            {
+                projectile.SetVector(newPosition);
             }
             else
             {
-                if (!IsProjectileOnEdge(newPosition, projectile))
-                    projectile.SetVector(newPosition);
+                _spatialGrid.Update(projectile);
             }
-            _spatialGrid.Update(projectile);
 
+        }
+
+        internal void HandleProjectileEdge(Vector2 newPosition, int reducedValue, Projectile projectile)
+        {
+            if (projectile.IsRemovableOrSizeReduction(newPosition, reducedValue))
+            {
+                _toRemove.Add(projectile);
+            }
+            else
+            {
+                _spatialGrid.Update(projectile);
+            }
         }
 
         internal bool IsCollided(Vector2 vector, Projectile projectile)
@@ -142,8 +170,11 @@ namespace SuperTanks.Core
 
             foreach (var other in nearby)
             {
-                if (other == projectile) continue;
+                if (other is Projectile && ((Projectile)other).GetTeam() == projectile.GetTeam()) continue;
                 if (other is Player && projectile.GetTeam() == Team.Player) continue;
+                if (other is Enemy && projectile.GetTeam() == Team.Enemy) continue;
+
+
 
                 Rectangle otherRect = other.Bounds(other.GetVector());
 
@@ -151,9 +182,7 @@ namespace SuperTanks.Core
                 {
                     return true;
                 }
-            }
-
-            
+            }           
 
             return false;
         }
@@ -161,7 +190,6 @@ namespace SuperTanks.Core
         private void HandleCollision(Vector2 newPosition, Projectile projectile)
         {
             Rectangle damageBox = CreateDamageBox(newPosition, projectile);
-
 
             var affected = _spatialGrid.GetNearby(damageBox);
             foreach (var target in affected)
@@ -171,10 +199,22 @@ namespace SuperTanks.Core
                 {
                     if (target.IsShootable())
                     {
-
-                        if (target is Player)
+                        if (target is Player player)
                         {
                             if (projectile.GetTeam() == Team.Player) continue;
+                            else
+                            {
+                                player.HitHandle(this);
+                            }
+                        }
+
+                        if (target is Enemy enemy)
+                        {
+                            if (projectile.GetTeam() == Team.Enemy) continue;
+                            else
+                            {
+                                enemy.HitHandle(this);
+                            }
                         }
 
                         if (target is ObjectArea area)
@@ -234,21 +274,13 @@ namespace SuperTanks.Core
             return false;
         }
 
-        internal void HandleProjectileEdge(Vector2 newPosition, int reducedValue, Projectile projectile)
-        {
-            if (projectile.IsRemovableOrSizeReduction(newPosition, reducedValue))
-            {
-                _toRemove.Add(projectile);
-            }
-        }
-
         internal Rectangle CreateDamageBox(Vector2 newPosition, Projectile projectile)
         {
             Rectangle damageBox = new Rectangle();
             Rectangle projRect = projectile.Bounds(projectile.GetVector());
 
-            int newPosX = (int)MathF.Round(newPosition.X);
-            int newPosY = (int)MathF.Round(newPosition.Y);
+            int newPosX = (int)(newPosition.X);
+            int newPosY = (int)(newPosition.Y);
 
 
             switch (projectile.GetDirection())
@@ -260,7 +292,7 @@ namespace SuperTanks.Core
                     break;
                 case Direction.Right:
                     {
-                        damageBox = new Rectangle(projRect.Right-1, projRect.Center.Y - _tileSize / 2, newPosX+ projectile.GetSizeX() - projRect.Right-1, _tileSize);
+                        damageBox = new Rectangle(projRect.Right, projRect.Center.Y - _tileSize / 2, newPosX+ projectile.GetSizeX() - projRect.Right, _tileSize);
                     }
                     break;
                 case Direction.Up:
@@ -270,16 +302,12 @@ namespace SuperTanks.Core
                     break;
                 case Direction.Down:
                     {
-                        damageBox = new Rectangle(projRect.Center.X - _tileSize / 2, projRect.Bottom-1, _tileSize, newPosY + projectile.GetSizeY() - projRect.Bottom - 1);
+                        damageBox = new Rectangle(projRect.Center.X - _tileSize / 2, projRect.Bottom, _tileSize, newPosY + projectile.GetSizeY() - projRect.Bottom);
                     }
                     break;
             }
             return damageBox;
         }
-
-
-
-
 
 
         internal void Shooting(LivingObject livingObject)
@@ -294,6 +322,7 @@ namespace SuperTanks.Core
             bool canCreate = true;
 
             int sizeX = 0, sizeY=0;
+            float coordinate = 0;
 
             switch (livingObject.GetDirection())
             {
@@ -303,6 +332,7 @@ namespace SuperTanks.Core
                         if (endPixelY < GetEdgeTop()) canCreate = false;
                         sizeX = projectileSize;
                         sizeY = projectileLength;
+                        coordinate = basePixelY;
                     }
                     break;
                 case Direction.Down:
@@ -312,6 +342,7 @@ namespace SuperTanks.Core
                         if (endPixelY > GetEdgeBottom(projectileLength)) canCreate = false;
                         sizeX = projectileSize;
                         sizeY = projectileLength;
+                        coordinate = livingObject.Bounds(livingObject.GetVector()).Bottom;
                     }
                     break;
                 case Direction.Left:
@@ -320,6 +351,7 @@ namespace SuperTanks.Core
                         if (endPixelX < GetEdgeLeft()) canCreate = false;
                         sizeX = projectileLength;
                         sizeY = projectileSize;
+                        coordinate= basePixelX;
                     }
                     break;
                 case Direction.Right:
@@ -329,6 +361,7 @@ namespace SuperTanks.Core
                         if (endPixelX > GetEdgeRight(projectileLength)) canCreate = false;
                         sizeX = projectileLength;
                         sizeY = projectileSize;
+                        coordinate = livingObject.Bounds(livingObject.GetVector()).Right;
                     }
                     break;
             }
@@ -339,13 +372,10 @@ namespace SuperTanks.Core
             if (livingObject is Player) owner = Team.Player;
             else owner = Team.Enemy;
 
-            Projectile projectile = EntityFactory.CreateProjectile(new Vector2(endPixelX, endPixelY), sizeX, sizeY, livingObject.GetDirection(), owner, livingObject.GetPower());
+            Projectile projectile = EntityFactory.CreateProjectile(new Vector2(endPixelX, endPixelY), sizeX, sizeY, livingObject.GetDirection(), owner, coordinate);
             _toAdd.Add(projectile);
 
         }
-
-
-
 
         internal void MoveWithClamp(Vector2 velocity, Vector2 movement, GameObject obj)
         {

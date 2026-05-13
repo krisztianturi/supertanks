@@ -49,6 +49,7 @@ namespace SuperTanks
             Assets._edgeAll = Content.Load<Texture2D>("images/edges");
 
             Assets.Test = Content.Load<Texture2D>("images/test");
+            Assets._enemy = Content.Load<Texture2D>("images/enemy");
             Assets._testProj = Content.Load<Texture2D>("images/testProj");
 
             Assets._wall = Content.Load<Texture2D>("images/wall");
@@ -75,6 +76,7 @@ namespace SuperTanks
 
         protected override void Draw(GameTime gameTime)
         {
+
             GraphicsDevice.Clear(Color.Black);
 
             _spriteBatch.Begin();

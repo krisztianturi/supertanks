@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
+using System.Diagnostics;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace SuperTanks.Systems
@@ -81,7 +83,6 @@ namespace SuperTanks.Systems
         {
             _sb.Draw(tex, vector + _offset, rect, color);
         }
-
 
     }
 }

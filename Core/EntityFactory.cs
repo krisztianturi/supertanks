@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using SuperTanks.Entities;
 using SuperTanks.Systems;
 
@@ -25,12 +26,17 @@ namespace SuperTanks.Core
 
         internal static Player CreatePlayer(Vector2 vector)
         {
-            return new Player(Assets.Test, vector, _tileSize, _tileSize, false, true,6,1);
+            return new Player(Assets.Test, vector, _tileSize, _tileSize, false, true,6,3);
         }
 
-        internal static Projectile CreateProjectile(Vector2 vector, int sizeX, int sizeY, Direction direction, Team owner, int damage)
+        internal static Projectile CreateProjectile(Vector2 vector, int sizeX, int sizeY, Direction direction, Team owner, float coordinate)
         {
-            return new Projectile(Assets._projectile, vector, sizeX, sizeY, false, false, direction, owner,damage);
+            return new Projectile(Assets._projectile, vector, sizeX, sizeY, false, true, direction, owner, coordinate);
+        }
+
+        internal static Enemy CreateEnemy(Vector2 vector, int power, int vitality)
+        {
+            return new Enemy(Assets._enemy, vector, _tileSize, _tileSize, false, true, power, vitality);
         }
 
     }
