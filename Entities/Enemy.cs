@@ -57,7 +57,6 @@ namespace SuperTanks.Entities
 
             gm.MoveWithClamp(velocity, movement, this);
 
-
             if (currentTime > _shootingTime + 1000)
             {
                 gm.Shooting(this);

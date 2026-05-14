@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using SuperTanks.Core;
 using SuperTanks.Systems;
+using System.Diagnostics;
 
 
 namespace SuperTanks.Entities
@@ -16,12 +17,12 @@ namespace SuperTanks.Entities
     internal class Projectile : GameObject
     {
         private Direction _direction;
-        private float _speed = 500f;
+        private float _speed = 200f;
         private Team _owner;
         private float _rotation;
         private static int _damage = 10;
 
-        private bool _visible = false;
+        private bool _visible;
         private float _ownerCoordinate;
 
         internal Team GetTeam() {  return _owner; }
@@ -60,21 +61,21 @@ namespace SuperTanks.Entities
                 case Direction.Left:
                     {
                         this.SetSizeX(this.GetSizeX() - reduction);
-                        if (this.GetSizeX() <= minSize) return true;
+                        if (this.GetSizeX() < minSize) return true;
                         this.SetVector(new Vector2(newPosition.X + reduction, newPosition.Y));
                     }
                     break;
                 case Direction.Right:
                     {
                         this.SetSizeX(this.GetSizeX() - reduction);
-                        if (this.GetSizeX() <= minSize) return true;
+                        if (this.GetSizeX() < minSize) return true;
                         this.SetVector(newPosition);
                     }
                     break;
                 case Direction.Up:
                     {
                         this.SetSizeY(this.GetSizeY() - reduction);
-                        if (this.GetSizeY() <= minSize) return true;
+                        if (this.GetSizeY() < minSize) return true;
                         this.SetVector(new Vector2(newPosition.X, newPosition.Y + reduction));
 
                     }
@@ -82,7 +83,7 @@ namespace SuperTanks.Entities
                 case Direction.Down:
                     {
                         this.SetSizeY(this.GetSizeY() - reduction);
-                        if (this.GetSizeY() <= minSize) return true;
+                        if (this.GetSizeY() < minSize) return true;
                         this.SetVector(newPosition);
                     }
                     break;
@@ -119,8 +120,6 @@ namespace SuperTanks.Entities
             position += velocity * _speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             gm.MoveProjectile(position,this);
-
-
         }
 
 

@@ -2,6 +2,7 @@
 using SuperTanks.Entities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ namespace SuperTanks.Core
     {
         private readonly int _cellSize;
         private readonly Dictionary<Point, List<GameObject>> _grid;
+        private static Vector2 _origin;
 
         public SpatialGrid(int cellSize)
         {
@@ -19,21 +21,25 @@ namespace SuperTanks.Core
             _grid = new Dictionary<Point, List<GameObject>>();
         }
 
+        internal static void SetOrigin(float x, float y) { _origin = new Vector2(x, y); }
+
         private List<Point> GetCells(Rectangle bounds)
         {
             List<Point> cells = new List<Point>();
 
-            int minX = bounds.Left / _cellSize;
-            int maxX = (bounds.Right - 1) / _cellSize;
+            int minX = (int)(bounds.Left - _origin.X) / _cellSize;
+            int maxX = (int)(bounds.Right - 1 - _origin.X) / _cellSize;
 
-            int minY = bounds.Top / _cellSize;
-            int maxY = (bounds.Bottom - 1) / _cellSize;
+            int minY = (int)(bounds.Top - _origin.Y) / _cellSize;
+            int maxY = (int)(bounds.Bottom - 1 - _origin.Y) / _cellSize;
 
             for (int x = minX; x <= maxX; x++)
+            {
                 for (int y = minY; y <= maxY; y++)
                 {
                     cells.Add(new Point(x, y));
                 }
+            }
 
             return cells;
         }
@@ -54,6 +60,7 @@ namespace SuperTanks.Core
 
                 list.Add(obj);
             }
+
         }
 
         public void Update(GameObject obj)

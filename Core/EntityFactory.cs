@@ -26,7 +26,7 @@ namespace SuperTanks.Core
 
         internal static Player CreatePlayer(Vector2 vector)
         {
-            return new Player(Assets.Test, vector, _tileSize, _tileSize, false, true,6,3);
+            return new Player(Assets.Test, vector, _tileSize, _tileSize, false, true,2,3);
         }
 
         internal static Projectile CreateProjectile(Vector2 vector, int sizeX, int sizeY, Direction direction, Team owner, float coordinate)
@@ -36,7 +36,7 @@ namespace SuperTanks.Core
 
         internal static Enemy CreateEnemy(Vector2 vector, int power, int vitality)
         {
-            return new Enemy(Assets._enemy, vector, _tileSize, _tileSize, false, true, power, vitality);
+            return new Enemy(Assets._enemy, vector, _tileSize, _tileSize, false, true, 0, vitality);
         }
 
     }

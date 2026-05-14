@@ -50,11 +50,11 @@ namespace SuperTanks.Core
             GameManager.SetEdges(_edgeSize, _drawSizeX - _edgeSize, _edgeSize, _drawSizeY - _edgeSize);
             SinglePlayerOverlay.SetEdgeSize(_edgeSize, _drawSizeX, _drawSizeY);
             Renderer.Offset = new Vector2(_restX / 2, _restY / 2);
+            SpatialGrid.SetOrigin(_edgeSize, _edgeSize);
         }
 
         internal GameCreator() 
         {
-            System.Diagnostics.Debug.WriteLine("Copy");
         }
 
 
@@ -100,7 +100,8 @@ namespace SuperTanks.Core
                     int pixelX =_edgeSize + x * _tileSize;
                     int pixelY = _edgeSize + y * _tileSize;
 
-                    if ((x == 0 && y == 0) || (x == _countX - 2 && y == 0))
+                    //if ((x == 0 && y == 0) || (x == _countX - 2 && y == 0))
+                    if ((x == 0 && y == 0))
                     {
                         Enemy enemy = EntityFactory.CreateEnemy(new Vector2(pixelX, pixelY), 1, 1);
                         gameObjects.Add(enemy);

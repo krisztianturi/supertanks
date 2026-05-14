@@ -141,9 +141,6 @@ namespace SuperTanks.Core
             else if(!IsProjectileOnEdge(newPosition, projectile))
             {
                 projectile.SetVector(newPosition);
-            }
-            else
-            {
                 _spatialGrid.Update(projectile);
             }
 
@@ -174,8 +171,6 @@ namespace SuperTanks.Core
                 if (other is Player && projectile.GetTeam() == Team.Player) continue;
                 if (other is Enemy && projectile.GetTeam() == Team.Enemy) continue;
 
-
-
                 Rectangle otherRect = other.Bounds(other.GetVector());
 
                 if (otherRect.Intersects(projRect))
@@ -194,11 +189,28 @@ namespace SuperTanks.Core
             var affected = _spatialGrid.GetNearby(damageBox);
             foreach (var target in affected)
             {
+                if (target.Equals(projectile))
+                {
+                    continue;
+                }
                 Rectangle targetRect = target.Bounds(target.GetVector());
                 if (targetRect.Intersects(damageBox))
                 {
                     if (target.IsShootable())
                     {
+                        
+                        if (target is Projectile tproj)
+                        {
+                            if (tproj.IsRemovableOrSizeReduction(tproj.GetVector()))
+                            {
+                                _toRemove.Add(tproj);
+                            }
+                            else
+                            {
+                                _spatialGrid.Update(tproj);
+                            }
+                        }
+
                         if (target is Player player)
                         {
                             if (projectile.GetTeam() == Team.Player) continue;
@@ -371,7 +383,6 @@ namespace SuperTanks.Core
             Team owner;
             if (livingObject is Player) owner = Team.Player;
             else owner = Team.Enemy;
-
             Projectile projectile = EntityFactory.CreateProjectile(new Vector2(endPixelX, endPixelY), sizeX, sizeY, livingObject.GetDirection(), owner, coordinate);
             _toAdd.Add(projectile);
 
