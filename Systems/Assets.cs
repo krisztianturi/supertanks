@@ -32,7 +32,10 @@ namespace SuperTanks.Systems
         internal static Texture2D _boostSpade;
         internal static Texture2D _boostGun;
         internal static Texture2D _boostLife;
-
+        internal static Texture2D _water;
+        internal static Texture2D _grass;
+        internal static Texture2D _boostShip;
+        internal static Texture2D _ice;
 
         internal static Rectangle[,] Load2D(Texture2D texture, int frameWidth, int frameHeight)
         {

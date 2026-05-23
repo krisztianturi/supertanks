@@ -18,6 +18,9 @@ namespace SuperTanks.Core
             {
                 case AreaType.WALL: return new ObjectArea(Assets._wall, vector, _tileSize / 10, _tileSize / 10, true, true, AreaType.WALL);
                 case AreaType.ROCK: return new ObjectArea(Assets._rock, vector, _tileSize / 10, _tileSize / 10, true, true, AreaType.ROCK);
+                case AreaType.WATER: return new ObjectArea(Assets._water, vector, _tileSize / 10, _tileSize / 10, true, false, AreaType.WATER);
+                case AreaType.GRASS: return new ObjectArea(Assets._grass, vector, _tileSize / 10, _tileSize / 10, false, true, AreaType.GRASS);
+                case AreaType.ICE: return new ObjectArea(Assets._ice, vector, _tileSize / 10, _tileSize / 10, false, false, AreaType.ICE);
                 case AreaType.EAGLE: return new ObjectArea(Assets._eagle, vector, _tileSize, _tileSize, true, true, AreaType.EAGLE);
                 default: return null;
             }
@@ -48,6 +51,7 @@ namespace SuperTanks.Core
                 case BoostType.Star: tex = Assets._boostStar; break;
                 case BoostType.Gun: tex= Assets._boostGun; break;
                 case BoostType.Spade: tex= Assets._boostSpade; break;
+                case BoostType.Ship: tex = Assets._boostShip; break;
             }
             return new Boost(tex, vector, _tileSize, _tileSize, false, true,type);
         }

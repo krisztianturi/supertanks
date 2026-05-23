@@ -20,7 +20,15 @@ namespace SuperTanks.Entities
 
         internal override void Draw(Renderer renderer)
         {
-            renderer.DrawRect(base.GetCurrentImg(), base.Bounds(base.GetVector()), Color.White);
+            if (_areaType!=AreaType.GRASS)
+            {
+                renderer.DrawWithDepth(base.GetCurrentImg(), base.GetVector(), Color.White, 0f);
+            }
+            else
+            {
+                renderer.DrawWithDepth(base.GetCurrentImg(), base.GetVector(), Color.White, 0.2f);
+            }
+
         }
 
         internal override void Update(GameTime gameTime, GameManager gm)
@@ -87,8 +95,18 @@ namespace SuperTanks.Entities
         WALL,
         ROCK,
         WATER,
-        ICE,
         GRASS,
+        ICE,
         EAGLE          
+    }
+
+    static class AreaTypeHelper
+    {
+        private static Random random = new Random();
+
+        public static AreaType GetRandom()
+        {
+            return (AreaType)random.Next(Enum.GetValues(typeof(AreaType)).Length-1);
+        }
     }
 }

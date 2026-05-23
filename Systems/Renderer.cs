@@ -39,7 +39,7 @@ namespace SuperTanks.Systems
 
         internal void DrawString(string text, Vector2 vector, Color color, float scale)
         {
-            _sb.DrawString(_font, text, vector, color, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+            _sb.DrawString(_font, text, vector, color, 0f, Vector2.Zero, scale, SpriteEffects.None, 0.1f);
         }
 
         internal Vector2 GetStringSize(string text)
@@ -69,6 +69,13 @@ namespace SuperTanks.Systems
             _sb.Draw(_pixel, rect, color);
         }
 
+        internal void DrawPixelRectDepth(Rectangle rect, Color color)
+        {
+            rect.X += (int)_offset.X;
+            rect.Y += (int)_offset.Y;
+            _sb.Draw(_pixel, rect,null, color, 0f, Vector2.Zero, SpriteEffects.None, 1);
+        }
+
         internal void DrawRect(Texture2D tex, Rectangle rect, Color color)
         {
             rect.X += (int)_offset.X;
@@ -81,9 +88,9 @@ namespace SuperTanks.Systems
             _sb.Draw(tex, vector + _offset, rect, color);
         }
 
-        internal void DrawWithDepth(Texture2D tex, Vector2 vector, Color color)
+        internal void DrawWithDepth(Texture2D tex, Vector2 vector, Color color, float depth)
         {
-            _sb.Draw(tex, vector, null, color, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.1f);
+            _sb.Draw(tex, vector + _offset, null, color, 0f, Vector2.Zero, 1f, SpriteEffects.None, depth);
         }
 
     }

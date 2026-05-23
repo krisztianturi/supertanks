@@ -8,7 +8,8 @@ namespace SuperTanks.Core
         Life,
         Star,
         Gun,
-        Spade
+        Spade,
+        Ship
 
     }
 

@@ -10,7 +10,7 @@ namespace SuperTanks.Entities
     internal class Enemy : LivingObject
     {
         private double _directionTime,_shootingTime, _LimitTime=100;
-        private float speed = 200f;
+        private float _speed = 200f;
         internal Enemy(Texture2D up, Texture2D down, Texture2D left, Texture2D right, Vector2 vector, int sizeX, int sizeY, bool blocking, bool shootable, int power, int vitality, Animation animation) : base(up, down, left, right, vector, sizeX, sizeY, blocking, shootable, power, vitality, animation)
         {
             Invulnerable = true;
@@ -72,9 +72,8 @@ namespace SuperTanks.Entities
                     }
                     break;
             }
-
-            Vector2 movement = velocity * speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-
+            float finalSpeed = OnIce ? _speed / 2 : _speed;
+            Vector2 movement = velocity * finalSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
             gm.MoveWithClamp(velocity, movement, this);
 
             if (currentTime > _shootingTime + 1000)
@@ -87,34 +86,43 @@ namespace SuperTanks.Entities
 
         internal void HitHandle(GameManager gm)
         {
-            if (this.GetPower() >= 3)
+            if (!this.Invulnerable)
             {
-                this.SetPower(this.GetPower() - 3);
-                return;
+                if (this.HasShip)
+                {
+                    HasShip = false;
+                    return;
+                }
+                else if (this.GetPower() >= 3)
+                {
+                    this.SetPower(this.GetPower() - 3);
+                    return;
+                }
+                else if (this.GetVitality() == 1)
+                {
+                    gm.RemoveEnemy(this);
+                    return;
+                }
+                this.SetVitality(this.GetVitality() - 1);
+                gm.MakeBoost();
             }
-            else if (this.GetVitality() == 1)
-            {
-                gm.RemoveEnemy(this);
-                return;
-            }
-            this.SetVitality(this.GetVitality() - 1);
-            gm.MakeBoost();
+
         }
 
         internal override void Draw(Renderer renderer)
         {
             if (GetVitality()>1)
             {
-                renderer.Draw(base.GetCurrentImg(), base.GetVector(), Color.Pink);
+                renderer.DrawWithDepth(base.GetCurrentImg(), base.GetVector(), Color.Pink,0.1f);
             }
             else
             {
-                renderer.Draw(base.GetCurrentImg(), base.GetVector(), Color.White);
+                renderer.DrawWithDepth(base.GetCurrentImg(), base.GetVector(), Color.White, 0.1f);
             }
 
             if (this.Invulnerable)
             {
-                renderer.Draw(this.GetAnimation().getImage(), base.GetVector(), Color.White);
+                renderer.DrawWithDepth(this.GetAnimation().getImage(), base.GetVector(), Color.White, 0.1f);
             }
         }
 

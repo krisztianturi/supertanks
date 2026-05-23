@@ -54,6 +54,9 @@ namespace SuperTanks
 
             Assets._wall = Content.Load<Texture2D>("images/wall");
             Assets._rock = Content.Load<Texture2D>("images/rock");
+            Assets._water = Content.Load<Texture2D>("images/water");
+            Assets._grass = Content.Load<Texture2D>("images/grass");
+            Assets._ice = Content.Load<Texture2D>("images/ice");
             Assets._eagle = Content.Load<Texture2D>("images/eagle");
 
             Assets._projectile = Content.Load<Texture2D>("images/projectile");
@@ -64,6 +67,7 @@ namespace SuperTanks
             Assets._boostGun = Content.Load<Texture2D>("images/boostGun");
             Assets._boostLife = Content.Load<Texture2D>("images/boostLife");
             Assets._boostSpade = Content.Load<Texture2D>("images/boostSpade");
+            Assets._boostShip = Content.Load<Texture2D>("images/boostShip");
 
             Assets._explosion[0] = Content.Load<Texture2D>("images/Explo1");
             Assets._explosion[1] = Content.Load<Texture2D>("images/Explo2");
@@ -91,7 +95,7 @@ namespace SuperTanks
 
             GraphicsDevice.Clear(Color.Azure);
 
-            _spriteBatch.Begin();
+            _spriteBatch.Begin(SpriteSortMode.FrontToBack);
             OverlayManager.Draw(_spriteBatch);
             _spriteBatch.End();
 

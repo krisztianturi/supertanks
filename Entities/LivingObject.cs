@@ -14,6 +14,8 @@ namespace SuperTanks.Entities
         protected bool Invulnerable { get; set; }
         private double _invulnerableTime = 1000;
         public double BecameInvulnerableTime { get; set; }
+        public bool HasShip { get; protected set; }
+        internal bool OnIce { get; set; }
 
         private Animation _animation;
         private readonly Texture2D _up, _down, _left, _right;
@@ -44,6 +46,7 @@ namespace SuperTanks.Entities
         protected Texture2D GetLeftImg() { return _left; }
         protected Texture2D GetRightImg() { return _right; }
 
+
         internal void HandleBoost(BoostType boostType)
         {
             int maxPower = 7;
@@ -52,6 +55,7 @@ namespace SuperTanks.Entities
                 case BoostType.Life: _vitality++; break;
                 case BoostType.Star: if(_power< maxPower) _power++; break;
                 case BoostType.Gun: if (_power < 4) _power = _power + 3; else _power = maxPower; break;
+                case BoostType.Ship:  HasShip = true; break;   
             }
         }
     }

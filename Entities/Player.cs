@@ -11,7 +11,7 @@ namespace SuperTanks.Entities
     internal class Player : LivingObject
     {
 
-        private float speed = 500f;
+        private float _speed = 500f;
         private double _shootingTime=0;
         private static double _holdProjectile = 300;
 
@@ -80,10 +80,9 @@ namespace SuperTanks.Entities
                 base.SetCurrentImg(base.GetRightImg());
             }
 
-
+            float finalSpeed = OnIce ? _speed / 2 : _speed;
             
-            Vector2 movement = velocity * speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-
+            Vector2 movement = velocity * finalSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
             gm.MoveWithClamp(velocity, movement, this);
             gm.CheckBoost(this);
         }
@@ -92,7 +91,12 @@ namespace SuperTanks.Entities
         {
             if (!this.Invulnerable)
             {
-                if (this.GetPower() >= 3)
+                if (this.HasShip)
+                {
+                    HasShip = false;
+                    return;
+                }
+                else if (this.GetPower() >= 3)
                 {
                     this.SetPower(this.GetPower() - 3);
                     this.Invulnerable = true;
@@ -113,10 +117,10 @@ namespace SuperTanks.Entities
 
         internal override void Draw(Renderer renderer)
         {
-            renderer.Draw(base.GetCurrentImg(), base.GetVector(), Color.White);
+            renderer.DrawWithDepth(base.GetCurrentImg(), base.GetVector(), Color.White,0.1f);
             if (this.Invulnerable)
             {
-                renderer.Draw(this.GetAnimation().getImage(), base.GetVector(), Color.White);
+                renderer.DrawWithDepth(this.GetAnimation().getImage(), base.GetVector(), Color.White,0.1f);
             }
         }
     }

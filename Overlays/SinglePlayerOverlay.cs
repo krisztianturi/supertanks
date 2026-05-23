@@ -59,10 +59,19 @@ namespace SuperTanks.Overlays
             renderer.DrawString("Power: "+power, new Vector2(destinationX, destinationY), Color.Blue, 1);
 
             placeX = renderer.GetStringSize("Life: " + player.GetVitality()).X;
-            placeY = renderer.GetStringSize("Life: " + player.GetVitality()).Y;
+            float lifePlaceY = renderer.GetStringSize("Life: " + player.GetVitality()).Y;
             destinationX = _drawSizeX + GameCreator._displaySize / 2 - placeX / 2;
-            destinationY = 2*(_drawSizeY/ 3) - placeY / 2;
-            renderer.DrawString("Life: " + player.GetVitality(), new Vector2(destinationX, destinationY), Color.Blue, 1);
+            float lifeDestinationY = 2*(_drawSizeY/ 3) - lifePlaceY / 2;
+            renderer.DrawString("Life: " + player.GetVitality(), new Vector2(destinationX, lifeDestinationY), Color.Blue, 1);
+
+            if (player.HasShip)
+            {
+                placeX = renderer.GetStringSize("Ship on!").X;
+                placeY = renderer.GetStringSize("Ship on!").Y;
+                destinationX = _drawSizeX + GameCreator._displaySize / 2 - placeX / 2;
+                destinationY = (destinationY+ lifePlaceY+ lifeDestinationY)/2 - placeY / 2;
+                renderer.DrawString("Ship On! ", new Vector2(destinationX, destinationY), Color.Blue, 1);
+            }
 
             _gameManager.Draw(renderer);
         }

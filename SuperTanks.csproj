@@ -16,6 +16,7 @@
   <ItemGroup>
     <None Remove="Content\images\boostGun.png" />
     <None Remove="Content\images\boostLife.png" />
+    <None Remove="Content\images\boostShip.png" />
     <None Remove="Content\images\boostSpade.png" />
     <None Remove="Content\images\boostStar.png" />
     <None Remove="Content\images\down.png" />
@@ -27,6 +28,8 @@
     <None Remove="Content\images\Explo2.png" />
     <None Remove="Content\images\Explo3.png" />
     <None Remove="Content\images\gameOver.png" />
+    <None Remove="Content\images\grass.png" />
+    <None Remove="Content\images\ice.png" />
     <None Remove="Content\images\invulne1.png" />
     <None Remove="Content\images\invulne2.png" />
     <None Remove="Content\images\left.png" />
@@ -37,6 +40,7 @@
     <None Remove="Content\images\testProj.png" />
     <None Remove="Content\images\up.png" />
     <None Remove="Content\images\wall.png" />
+    <None Remove="Content\images\water.png" />
     <None Remove="Icon.ico" />
     <None Remove="Icon.bmp" />
   </ItemGroup>
@@ -45,6 +49,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\images\boostLife.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\boostShip.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\images\boostSpade.png">
@@ -80,6 +87,12 @@
     <Content Include="Content\images\gameOver.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\images\grass.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\ice.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\images\invulne1.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -108,6 +121,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\images\wall.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\water.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

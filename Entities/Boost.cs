@@ -16,7 +16,7 @@ namespace SuperTanks.Entities
 
         internal override void Draw(Renderer renderer)
         {
-            renderer.Draw(this.GetCurrentImg(), this.GetVector(),Color.White*0.5f);
+            renderer.DrawWithDepth(this.GetCurrentImg(), this.GetVector(),Color.White*0.5f,0.3f);
         }
 
         internal override void Update(GameTime gameTime, GameManager gm)

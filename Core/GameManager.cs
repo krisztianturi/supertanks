@@ -190,6 +190,10 @@ namespace SuperTanks.Core
                 if (other is Enemy && projectile.GetTeam() == Team.Enemy) continue;
 
                 if(other is Boost) continue;
+                if (other is ObjectArea area)
+                {
+                    if (area.GetAreaType() == AreaType.ICE || area.GetAreaType() == AreaType.GRASS && projectile.GetPower() < 6) continue;
+                }
 
                 Rectangle otherRect = other.Bounds(other.GetVector());
 
@@ -257,7 +261,7 @@ namespace SuperTanks.Core
                                 _isGameOver = true;
                                 _toRemove.Add(target);
                             }
-                            else if(area.GetAreaType() == AreaType.WALL || (area.GetAreaType() == AreaType.ROCK && projectile.GetPower()>2))
+                            else if(area.GetAreaType() == AreaType.WALL || (area.GetAreaType() == AreaType.ROCK && projectile.GetPower()>2) || (area.GetAreaType() == AreaType.GRASS && projectile.GetPower() > 5))
                             {
                                 if (area.IsRemovable(targetRect, damageBox, projectile.GetDirection()))
                                 {
@@ -407,9 +411,10 @@ namespace SuperTanks.Core
 
         }
 
-        internal void MoveWithClamp(Vector2 velocity, Vector2 movement, GameObject obj)
+        internal void MoveWithClamp(Vector2 velocity, Vector2 movement, LivingObject obj)
         {
             Vector2 nextPosition = obj.GetVector() + movement;
+            bool onIce = false;
 
             if (velocity.X < 0)
             {
@@ -421,7 +426,17 @@ namespace SuperTanks.Core
                 foreach (GameObject other in nearbyObjects)
                 {
                     if (other == obj) continue;
+
+                    if (other is ObjectArea are && are.GetAreaType() == AreaType.ICE)
+                    {
+                        onIce = true;
+                    }
+
                     if (!other.IsBlocking()) continue;
+                    else if (other is ObjectArea area && area.GetAreaType() == AreaType.WATER && obj.HasShip)
+                    {
+                        continue;
+                    }
 
                     Rectangle otherBounds = other.Bounds(other.GetVector());
                     if (otherBounds.Intersects(nextBounds))
@@ -449,9 +464,8 @@ namespace SuperTanks.Core
                     else
                     {
                         obj.SetVector(nextPosition);
-                    }                    
+                    }
                 }
-                _spatialGrid.Update(obj);
 
             }
             else if (velocity.X > 0)
@@ -464,8 +478,16 @@ namespace SuperTanks.Core
                 foreach (GameObject other in nearbyObjects)
                 {
                     if (other == obj) continue;
-                    if (!other.IsBlocking()) continue;
+                    if (other is ObjectArea are && are.GetAreaType() == AreaType.ICE)
+                    {
+                        onIce = true;
+                    }
 
+                    if (!other.IsBlocking()) continue;
+                    else if (other is ObjectArea area && area.GetAreaType() == AreaType.WATER && obj.HasShip)
+                    {
+                        continue;
+                    }
                     Rectangle otherBounds = other.Bounds(other.GetVector());
                     if (otherBounds.Intersects(nextBounds))
                     {
@@ -494,7 +516,6 @@ namespace SuperTanks.Core
                         obj.SetVector(nextPosition);
                     }
                 }
-                _spatialGrid.Update(obj);
 
             }
 
@@ -508,7 +529,16 @@ namespace SuperTanks.Core
                 foreach (GameObject other in nearbyObjects)
                 {
                     if (other == obj) continue;
+                    if (other is ObjectArea are && are.GetAreaType() == AreaType.ICE)
+                    {
+                        onIce = true;
+                    }
+
                     if (!other.IsBlocking()) continue;
+                    else if (other is ObjectArea area && area.GetAreaType() == AreaType.WATER && obj.HasShip)
+                    {
+                        continue;
+                    }
 
                     Rectangle otherBounds = other.Bounds(other.GetVector());
                     if (otherBounds.Intersects(nextBounds))
@@ -539,7 +569,6 @@ namespace SuperTanks.Core
                     }
 
                 }
-                _spatialGrid.Update(obj);
             }
             else if (velocity.Y > 0)
             {
@@ -551,7 +580,17 @@ namespace SuperTanks.Core
                 foreach (GameObject other in nearbyObjects)
                 {
                     if (other == obj) continue;
+
+                    if(other is ObjectArea are && are.GetAreaType() == AreaType.ICE)
+                    {
+                        onIce = true;
+                    }
+
                     if (!other.IsBlocking()) continue;
+                    else if (other is ObjectArea area && area.GetAreaType() == AreaType.WATER && obj.HasShip)
+                    {
+                        continue;
+                    }
 
                     Rectangle otherBounds = other.Bounds(other.GetVector());
                     if (otherBounds.Intersects(nextBounds))
@@ -580,12 +619,16 @@ namespace SuperTanks.Core
                     {
                         obj.SetVector(nextPosition);
                     }
-
                 }
-                _spatialGrid.Update(obj);
-            }              
                 
-            
+            }
+
+            if (velocity!= Vector2.Zero)
+            {
+                obj.OnIce = onIce;
+                _spatialGrid.Update(obj);
+            }
+
 
         }
 
@@ -654,37 +697,38 @@ namespace SuperTanks.Core
             int areaSize = 10;
             Rectangle expandedRect = new Rectangle(_eagleRect.X - _tileSize, _eagleRect.Y - _tileSize, _eagleRect.Width + 2 * _tileSize, _eagleRect.Height + _tileSize);
 
+            List<GameObject> nearby = _spatialGrid.GetNearby(expandedRect);
+
             for (int x = expandedRect.Left; x < expandedRect.Right; x += areaSize)
             {
                 for (int y = expandedRect.Top; y < expandedRect.Bottom; y += areaSize)
                 {
                     Rectangle areaRect = new Rectangle(x, y, areaSize, areaSize);
 
-                    List<GameObject> nearbyFromArea = _spatialGrid.GetNearby(areaRect);
-
                     bool eagle = false;
 
-                    foreach (var item in nearbyFromArea)
+                    foreach (var item in nearby)
                     {
                         if (item is ObjectArea area)
                         {
-                            if (area.GetAreaType() != AreaType.EAGLE)
+                            if (area.Bounds(area.GetVector()).Intersects(areaRect))
                             {
-                                _toRemove.Add(area);
+                                if (area.GetAreaType() == AreaType.EAGLE)
+                                {
+                                    eagle = true;
+                                }
+                                else
+                                {
+                                    _toRemove.Add(area);
+                                }
                             }
-                            else
-                            {
-                                eagle = true;
-                            }
-
                         }
-
                     }
+
                     if (!eagle)
                     {
                         _toAdd.Add(EntityFactory.CreateArea(new Vector2(x, y), AreaType.ROCK));
                     }
-
                 }
             }
         }

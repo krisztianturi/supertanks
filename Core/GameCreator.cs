@@ -171,11 +171,7 @@ namespace SuperTanks.Core
                     double randomNum = random.NextDouble();
                     if (randomNum < 0.1)
                     {
-                        CreateTile(pixelX, pixelY, AreaType.WALL);
-                    }
-                    else if (randomNum < 0.11)
-                    {
-                        CreateTile(pixelX, pixelY, AreaType.ROCK);
+                        CreateTile(pixelX, pixelY, AreaTypeHelper.GetRandom());
                     }
                 }
             }
