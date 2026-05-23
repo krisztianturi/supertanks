@@ -6,10 +6,10 @@ namespace SuperTanks.Systems
 {
     internal class Assets
     {
-        internal static Texture2D _playerUp;
-        internal static Texture2D _playerDown;
-        internal static Texture2D _playerLeft;
-        internal static Texture2D _playerRight;
+        internal static Texture2D _up;
+        internal static Texture2D _down;
+        internal static Texture2D _left;
+        internal static Texture2D _right;
 
         
         internal static Texture2D _edgeAll;
@@ -25,6 +25,14 @@ namespace SuperTanks.Systems
         internal static Texture2D _enemy;
 
         internal static Texture2D _projectile;
+        internal static Texture2D _boostStar;
+
+        internal static Texture2D[] _explosion = new Texture2D[3];
+        internal static Texture2D[] _invulnerable = new Texture2D[2];
+        internal static Texture2D _boostSpade;
+        internal static Texture2D _boostGun;
+        internal static Texture2D _boostLife;
+
 
         internal static Rectangle[,] Load2D(Texture2D texture, int frameWidth, int frameHeight)
         {

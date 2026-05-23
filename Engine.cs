@@ -40,10 +40,10 @@ namespace SuperTanks
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            Assets._playerUp = Content.Load<Texture2D>("images/up");
-            Assets._playerDown = Content.Load<Texture2D>("images/down");
-            Assets._playerLeft = Content.Load<Texture2D>("images/left");
-            Assets._playerRight = Content.Load<Texture2D>("images/right");
+            Assets._up = Content.Load<Texture2D>("images/up");
+            Assets._down = Content.Load<Texture2D>("images/down");
+            Assets._left = Content.Load<Texture2D>("images/left");
+            Assets._right = Content.Load<Texture2D>("images/right");
 
 
             Assets._edgeAll = Content.Load<Texture2D>("images/edges");
@@ -58,7 +58,19 @@ namespace SuperTanks
 
             Assets._projectile = Content.Load<Texture2D>("images/projectile");
 
-            Assets._gameOver = Content.Load<Texture2D>("images/gameOver"); ;
+            Assets._gameOver = Content.Load<Texture2D>("images/gameOver");
+
+            Assets._boostStar = Content.Load<Texture2D>("images/boostStar");
+            Assets._boostGun = Content.Load<Texture2D>("images/boostGun");
+            Assets._boostLife = Content.Load<Texture2D>("images/boostLife");
+            Assets._boostSpade = Content.Load<Texture2D>("images/boostSpade");
+
+            Assets._explosion[0] = Content.Load<Texture2D>("images/Explo1");
+            Assets._explosion[1] = Content.Load<Texture2D>("images/Explo2");
+            Assets._explosion[2] = Content.Load<Texture2D>("images/Explo3");
+
+            Assets._invulnerable[0] = Content.Load<Texture2D>("images/invulne1");
+            Assets._invulnerable[1] = Content.Load<Texture2D>("images/invulne2");
 
 
             Renderer.SetFont(Content.Load<SpriteFont>("File"));
@@ -77,7 +89,7 @@ namespace SuperTanks
         protected override void Draw(GameTime gameTime)
         {
 
-            GraphicsDevice.Clear(Color.Black);
+            GraphicsDevice.Clear(Color.Azure);
 
             _spriteBatch.Begin();
             OverlayManager.Draw(_spriteBatch);

@@ -24,10 +24,15 @@ namespace SuperTanks.Core
 
         public static readonly int _tileSize = 100;
         public static readonly int _edgeSize = 50;
+        public static readonly int _displaySize = 150;
 
         private List<GameObject> gameObjects;
         private SpatialGrid _spatialGrid;
         private Player _player1;
+        private Rectangle _eagleRect;
+        private Rectangle[] _enemyRects = new Rectangle[2];
+
+        internal Player GetPlayer1() { return _player1; }
         
 
         static GameCreator()
@@ -35,11 +40,14 @@ namespace SuperTanks.Core
             _screenX = Engine.GetScreenWidth();
             _screenY = Engine.GetScreenHeight();
 
+            _screenX -= _displaySize;
+
             _countX = _screenX / _tileSize;
             _countY = _screenY / _tileSize;
 
             _drawSizeX = _countX * _tileSize;
             _drawSizeY = _countY * _tileSize;
+
 
             _restX = _screenX - _drawSizeX;
             _restY = _screenY - _drawSizeY;
@@ -64,7 +72,7 @@ namespace SuperTanks.Core
             gameObjects = new List<GameObject>();
             _spatialGrid = new SpatialGrid(_tileSize);
             GenerateSinglePlayerMap();
-            GameManager gameManager = new GameManager(_spatialGrid);
+            GameManager gameManager = new GameManager(_spatialGrid,_eagleRect, _enemyRects);
             gameManager.AddObject(_player1);
             _spatialGrid.Add(_player1);
             gameManager.AddObjects(gameObjects);
@@ -92,6 +100,7 @@ namespace SuperTanks.Core
 
         private void GenerateSinglePlayerMap()
         {
+            int counter = 0;
             Random random = new Random();
             for (int x = 0; x < _countX-1; x++)
             {
@@ -100,8 +109,8 @@ namespace SuperTanks.Core
                     int pixelX =_edgeSize + x * _tileSize;
                     int pixelY = _edgeSize + y * _tileSize;
 
-                    //if ((x == 0 && y == 0) || (x == _countX - 2 && y == 0))
-                    if ((x == 0 && y == 0))
+                    //if ((x == 0 && y == 0))
+                    if ((x == 0 && y == 0) || (x == _countX - 2 && y == 0))
                     {
                         Enemy enemy = EntityFactory.CreateEnemy(new Vector2(pixelX, pixelY), 1, 1);
                         gameObjects.Add(enemy);
@@ -109,6 +118,13 @@ namespace SuperTanks.Core
 
                         pixelX += enemy.GetSizeX();
                         pixelY += enemy.GetSizeY();
+                        _enemyRects[counter] = enemy.Bounds(enemy.GetVector());
+                        counter++;
+                        continue;
+                    }
+
+                    if (y==0)
+                    {
                         continue;
                     }
 
@@ -148,6 +164,7 @@ namespace SuperTanks.Core
                         _spatialGrid.Add(obj);
                         pixelX += obj.GetSizeX();
                         pixelY += obj.GetSizeY();
+                        _eagleRect = obj.Bounds(obj.GetVector());
                         continue;
                     }
 

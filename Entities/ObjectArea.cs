@@ -3,11 +3,6 @@ using Microsoft.Xna.Framework.Graphics;
 using SuperTanks.Core;
 using SuperTanks.Systems;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SuperTanks.Entities
 {

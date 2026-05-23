@@ -47,6 +47,15 @@ namespace SuperTanks.Entities
             _shootable = shootable;
         }
 
+        protected GameObject( Vector2 vector, int sizeX, int sizeY, bool blocking, bool shootable)
+        {
+            _vector = vector;
+            _sizeX = sizeX;
+            _sizeY = sizeY;
+            _blocking = blocking;
+            _shootable = shootable;
+        }
+
         internal abstract void Update(GameTime gameTime, GameManager gm);
         internal abstract void Draw(Renderer renderer);
 
@@ -55,6 +64,7 @@ namespace SuperTanks.Entities
         internal bool IsBlocking() { return _blocking; }
 
         internal bool IsShootable() { return _shootable; }
+        internal void SetShootable(bool value) { _shootable = value; }
 
         internal int GetSizeX() { return _sizeX; }
         internal int GetSizeY() { return _sizeY; }
@@ -64,5 +74,6 @@ namespace SuperTanks.Entities
 
 
         protected Texture2D GetCurrentImg() { return _currentImg; }
+        protected void SetCurrentImg(Texture2D tex) { _currentImg = tex; }
     }
 }

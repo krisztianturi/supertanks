@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using SuperTanks.Core;
 using SuperTanks.Systems;
+using System;
 using System.Diagnostics;
 
 
@@ -17,20 +18,26 @@ namespace SuperTanks.Entities
     internal class Projectile : GameObject
     {
         private Direction _direction;
-        private float _speed = 200f;
+        private float _speed = 500f;
         private Team _owner;
         private float _rotation;
-        private static int _damage = 10;
+        private static int _decreaseValue = 10;
 
         private bool _visible;
         private float _ownerCoordinate;
+        private int _power;
+        private Animation _animation;
+        private bool _activeAnimation;
+        private Rectangle _damageBox;
 
         internal Team GetTeam() {  return _owner; }
         internal Direction GetDirection() { return _direction; }
-        public Projectile(Texture2D currentImg, Vector2 vector, int sizeX, int sizeY, bool blocking, bool shootable, Direction direction, Team owner, float coordinate) : base(currentImg, vector, sizeX, sizeY, blocking, shootable)
+        internal int GetPower() { return _power; }
+        public Projectile(Texture2D currentImg, Vector2 vector, int sizeX, int sizeY, bool blocking, bool shootable, Direction direction, Team owner,int power, float coordinate, Animation animation) : base(currentImg, vector, sizeX, sizeY, blocking, shootable)
         {
             this._direction = direction;
             _owner = owner;
+            _power = power;
             _ownerCoordinate = coordinate;
 
             switch (direction)
@@ -51,6 +58,8 @@ namespace SuperTanks.Entities
                     _rotation = MathHelper.ToRadians(270f);
                     break;
             }
+
+            _animation = animation;
         }
 
         internal bool SizeReduction(Vector2 newPosition, int reduction)
@@ -96,7 +105,7 @@ namespace SuperTanks.Entities
 
         internal bool IsRemovableOrSizeReduction(Vector2 newPosition)
         {
-            return SizeReduction(newPosition, _damage);
+            return SizeReduction(newPosition, _decreaseValue);
         }
 
         internal bool IsRemovableOrSizeReduction(Vector2 newPosition, int reduction)
@@ -106,6 +115,16 @@ namespace SuperTanks.Entities
 
         internal override void Update(GameTime gameTime, GameManager gm)
         {
+            if (_activeAnimation)
+            {
+                if (_animation.Total == 1)
+                {
+                    _activeAnimation = false;
+                    _animation.Total = 0;
+                }
+                _animation.Update();
+
+            }
             Vector2 velocity = Vector2.Zero;
 
             switch (_direction)
@@ -127,6 +146,11 @@ namespace SuperTanks.Entities
         {
             if (_visible)
             {
+                if (_activeAnimation)
+                {
+                    renderer.DrawRect(_animation.getImage(), _damageBox,  Color.White);
+                }
+
                 Texture2D tex = base.GetCurrentImg();
                 Vector2 scale;
 
@@ -183,6 +207,12 @@ namespace SuperTanks.Entities
 
         }
 
-        internal static int GetDamage() {  return _damage; }
+        internal static int GetDamage() {  return _decreaseValue; }
+
+        internal void CollisionAnimation(Rectangle damageBox)
+        {
+            _activeAnimation = true;
+            _damageBox = damageBox;
+        }
     }
 }

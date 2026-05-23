@@ -1,8 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Diagnostics;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace SuperTanks.Systems
 {
@@ -82,6 +79,11 @@ namespace SuperTanks.Systems
         internal void DrawWithRect(Texture2D tex, Vector2 vector, Rectangle rect, Color color)
         {
             _sb.Draw(tex, vector + _offset, rect, color);
+        }
+
+        internal void DrawWithDepth(Texture2D tex, Vector2 vector, Color color)
+        {
+            _sb.Draw(tex, vector, null, color, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.1f);
         }
 
     }

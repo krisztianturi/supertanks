@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SuperTanks.Core;
+using SuperTanks.Entities;
 using SuperTanks.Systems;
 
 namespace SuperTanks.Overlays
@@ -46,6 +47,22 @@ namespace SuperTanks.Overlays
                 renderer.DrawWithRect(Assets._edgeAll, new Vector2(0, i * _edgeSize), _edges[6], Color.White);
                 renderer.DrawWithRect(Assets._edgeAll, new Vector2(_drawSizeX - _edgeSize, i * _edgeSize), _edges[7], Color.White);
             }
+
+            renderer.DrawPixelRect(new Rectangle(_drawSizeX, 0, GameCreator._displaySize, _drawSizeY), Color.Gray);
+            Player player = GameCreator.Instance.GetPlayer1();
+
+            float placeX = renderer.GetStringSize("Power: " + player.GetPower()).X;
+            float placeY = renderer.GetStringSize("Power: " + player.GetPower()).Y;
+            float destinationX = _drawSizeX + GameCreator._displaySize / 2 - placeX / 2;
+            float destinationY = _drawSizeY / 3 - placeY / 2;
+            int power = player.GetPower() + 1;
+            renderer.DrawString("Power: "+power, new Vector2(destinationX, destinationY), Color.Blue, 1);
+
+            placeX = renderer.GetStringSize("Life: " + player.GetVitality()).X;
+            placeY = renderer.GetStringSize("Life: " + player.GetVitality()).Y;
+            destinationX = _drawSizeX + GameCreator._displaySize / 2 - placeX / 2;
+            destinationY = 2*(_drawSizeY/ 3) - placeY / 2;
+            renderer.DrawString("Life: " + player.GetVitality(), new Vector2(destinationX, destinationY), Color.Blue, 1);
 
             _gameManager.Draw(renderer);
         }

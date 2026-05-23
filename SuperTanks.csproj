@@ -14,12 +14,21 @@
     <Optimize>False</Optimize>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Content\images\boostGun.png" />
+    <None Remove="Content\images\boostLife.png" />
+    <None Remove="Content\images\boostSpade.png" />
+    <None Remove="Content\images\boostStar.png" />
     <None Remove="Content\images\down.png" />
     <None Remove="Content\images\eagle.png" />
     <None Remove="Content\images\edge.png" />
     <None Remove="Content\images\edges.png" />
     <None Remove="Content\images\enemy.png" />
+    <None Remove="Content\images\Explo1.png" />
+    <None Remove="Content\images\Explo2.png" />
+    <None Remove="Content\images\Explo3.png" />
     <None Remove="Content\images\gameOver.png" />
+    <None Remove="Content\images\invulne1.png" />
+    <None Remove="Content\images\invulne2.png" />
     <None Remove="Content\images\left.png" />
     <None Remove="Content\images\projectile.png" />
     <None Remove="Content\images\right.png" />
@@ -32,6 +41,18 @@
     <None Remove="Icon.bmp" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\images\boostGun.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\boostLife.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\boostSpade.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\boostStar.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\images\down.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -47,7 +68,22 @@
     <Content Include="Content\images\enemy.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\images\Explo1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\Explo2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\Explo3.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\images\gameOver.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\invulne1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\invulne2.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\images\left.png">

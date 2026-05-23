@@ -11,17 +11,33 @@ namespace SuperTanks.Entities
     {
         private double _directionTime,_shootingTime, _LimitTime=100;
         private float speed = 200f;
-
-        internal Enemy(Texture2D currentImg, Vector2 vector, int sizeX, int sizeY, bool blocking, bool shootable, int power, int vitality) : base(currentImg, vector, sizeX, sizeY, blocking, shootable, power, vitality)
+        internal Enemy(Texture2D up, Texture2D down, Texture2D left, Texture2D right, Vector2 vector, int sizeX, int sizeY, bool blocking, bool shootable, int power, int vitality, Animation animation) : base(up, down, left, right, vector, sizeX, sizeY, blocking, shootable, power, vitality, animation)
         {
+            Invulnerable = true;
         }
 
         internal override void Update(GameTime gameTime, GameManager gm)
         {
+            double currentTime = gameTime.TotalGameTime.TotalMilliseconds;
+
+            if (this.Invulnerable)
+            {
+                if (this.BecameInvulnerableTime == 0)
+                {
+                    BecameInvulnerableTime = gameTime.TotalGameTime.TotalMilliseconds;
+                }
+                else if (currentTime > BecameInvulnerableTime+ this.GetInvulnerableTime())
+                {
+                    Invulnerable = false;
+                    BecameInvulnerableTime = 0;
+                }
+            }
+
+
 
             Vector2 velocity = Vector2.Zero;
 
-            double currentTime = gameTime.TotalGameTime.TotalMilliseconds;
+
             if (currentTime > _directionTime + _LimitTime)
             {
                 this.SetDirection(DirectionHelper.GetRandom());
@@ -34,21 +50,25 @@ namespace SuperTanks.Entities
                 case Direction.Left:
                     {
                         velocity.X -= 1;
+                        base.SetCurrentImg(base.GetLeftImg());
                     }
                     break;
                 case Direction.Right:
                     {
                         velocity.X += 1;
+                        base.SetCurrentImg(base.GetRightImg());
                     }
                     break;
                 case Direction.Up:
                     {
                         velocity.Y -= 1;
+                        base.SetCurrentImg(base.GetUpImg());
                     }
                     break;
                 case Direction.Down:
                     {
                         velocity.Y += 1;
+                        base.SetCurrentImg(base.GetDownImg());
                     }
                     break;
             }
@@ -67,17 +87,35 @@ namespace SuperTanks.Entities
 
         internal void HitHandle(GameManager gm)
         {
-            if (this.GetVitality() == 1)
+            if (this.GetPower() >= 3)
             {
-                gm.RemoveObject(this);
+                this.SetPower(this.GetPower() - 3);
+                return;
+            }
+            else if (this.GetVitality() == 1)
+            {
+                gm.RemoveEnemy(this);
                 return;
             }
             this.SetVitality(this.GetVitality() - 1);
+            gm.MakeBoost();
         }
 
         internal override void Draw(Renderer renderer)
         {
-            renderer.Draw(base.GetCurrentImg(), base.GetVector(), Color.White);
+            if (GetVitality()>1)
+            {
+                renderer.Draw(base.GetCurrentImg(), base.GetVector(), Color.Pink);
+            }
+            else
+            {
+                renderer.Draw(base.GetCurrentImg(), base.GetVector(), Color.White);
+            }
+
+            if (this.Invulnerable)
+            {
+                renderer.Draw(this.GetAnimation().getImage(), base.GetVector(), Color.White);
+            }
         }
 
 

@@ -7,7 +7,6 @@ using SuperTanks.Systems;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 
 namespace SuperTanks.Core
 {
@@ -23,6 +22,11 @@ namespace SuperTanks.Core
 
         private bool _isGameOver = false;
         private readonly int _tileSize = 100;
+        private Rectangle _eagleRect;
+        private Rectangle[] _enemyRects;
+        private int _totalEnemies = 8;
+        private static int _totalBoosts = 3;
+        private List<Boost> _activeBoosts = new();
 
 
         internal static void SetEdges(int left, int right, int top, int bottom)
@@ -33,9 +37,11 @@ namespace SuperTanks.Core
             _edgeBottom = bottom;
         }
 
-        internal GameManager(SpatialGrid _spatialGrid)
+        internal GameManager(SpatialGrid _spatialGrid, Rectangle eagle, Rectangle[] enemyRects)
         {
             this._spatialGrid = _spatialGrid;
+            _eagleRect = eagle;
+            _enemyRects = enemyRects;
         }
 
         internal static int GetEdgeLeft() {  return _edgeLeft; }
@@ -121,7 +127,21 @@ namespace SuperTanks.Core
             _objects.Add(go);
         }
 
-        internal void RemoveObject(GameObject o) { _toRemove.Add(o); }
+        internal void RemoveEnemy(GameObject o) 
+        { 
+            _toRemove.Add(o);
+            Random r = new();
+            if (_totalEnemies!=0)
+            {
+                int index = r.Next(_enemyRects.Length);
+                Rectangle enemyRect = _enemyRects[index];
+                Enemy enemy = EntityFactory.CreateEnemy(new Vector2(enemyRect.X, enemyRect.Y),1,2);
+                _toAdd.Add(enemy);
+                _totalEnemies--;
+            }
+
+
+        }
         internal void UpdateObject(GameObject o) { _spatialGrid.Update(o); }
 
         internal void MoveProjectile(Vector2 newPosition, Projectile projectile)
@@ -163,13 +183,13 @@ namespace SuperTanks.Core
             Rectangle projRect = projectile.Bounds(vector);
             List<GameObject> nearby = _spatialGrid.GetNearby(projRect);
 
-            var hitAreas = new List<Rectangle>();
-
             foreach (var other in nearby)
             {
                 if (other is Projectile && ((Projectile)other).GetTeam() == projectile.GetTeam()) continue;
                 if (other is Player && projectile.GetTeam() == Team.Player) continue;
                 if (other is Enemy && projectile.GetTeam() == Team.Enemy) continue;
+
+                if(other is Boost) continue;
 
                 Rectangle otherRect = other.Bounds(other.GetVector());
 
@@ -198,7 +218,8 @@ namespace SuperTanks.Core
                 {
                     if (target.IsShootable())
                     {
-                        
+                        projectile.CollisionAnimation(damageBox);
+
                         if (target is Projectile tproj)
                         {
                             if (tproj.IsRemovableOrSizeReduction(tproj.GetVector()))
@@ -236,7 +257,7 @@ namespace SuperTanks.Core
                                 _isGameOver = true;
                                 _toRemove.Add(target);
                             }
-                            else
+                            else if(area.GetAreaType() == AreaType.WALL || (area.GetAreaType() == AreaType.ROCK && projectile.GetPower()>2))
                             {
                                 if (area.IsRemovable(targetRect, damageBox, projectile.GetDirection()))
                                 {
@@ -246,7 +267,6 @@ namespace SuperTanks.Core
                                 {
                                     _spatialGrid.Update(target);
                                 }
-
                             }
 
                         }
@@ -294,27 +314,26 @@ namespace SuperTanks.Core
             int newPosX = (int)(newPosition.X);
             int newPosY = (int)(newPosition.Y);
 
-
             switch (projectile.GetDirection())
             {
                 case Direction.Left:
                     {
-                        damageBox = new Rectangle(newPosX, projRect.Center.Y -_tileSize/2 ,projRect.Left- newPosX , _tileSize);
+                        damageBox = new Rectangle(newPosX, projRect.Center.Y - _tileSize / 2, projRect.Right - newPosX, _tileSize);
                     }
                     break;
                 case Direction.Right:
                     {
-                        damageBox = new Rectangle(projRect.Right, projRect.Center.Y - _tileSize / 2, newPosX+ projectile.GetSizeX() - projRect.Right, _tileSize);
+                        damageBox = new Rectangle(projRect.Left, projRect.Center.Y - _tileSize / 2, newPosX + projectile.GetSizeX() - projRect.Left, _tileSize);
                     }
                     break;
                 case Direction.Up:
                     {
-                        damageBox = new Rectangle(projRect.Center.X - _tileSize / 2, newPosY, _tileSize, projRect.Top - newPosY);
+                        damageBox = new Rectangle(projRect.Center.X - _tileSize / 2, newPosY, _tileSize, projRect.Bottom - newPosY);
                     }
                     break;
                 case Direction.Down:
                     {
-                        damageBox = new Rectangle(projRect.Center.X - _tileSize / 2, projRect.Bottom, _tileSize, newPosY + projectile.GetSizeY() - projRect.Bottom);
+                        damageBox = new Rectangle(projRect.Center.X - _tileSize / 2, projRect.Top, _tileSize, newPosY + projectile.GetSizeY() - projRect.Top);
                     }
                     break;
             }
@@ -383,7 +402,7 @@ namespace SuperTanks.Core
             Team owner;
             if (livingObject is Player) owner = Team.Player;
             else owner = Team.Enemy;
-            Projectile projectile = EntityFactory.CreateProjectile(new Vector2(endPixelX, endPixelY), sizeX, sizeY, livingObject.GetDirection(), owner, coordinate);
+            Projectile projectile = EntityFactory.CreateProjectile(new Vector2(endPixelX, endPixelY), sizeX, sizeY, livingObject.GetDirection(), owner, livingObject.GetPower(), coordinate);
             _toAdd.Add(projectile);
 
         }
@@ -430,10 +449,9 @@ namespace SuperTanks.Core
                     else
                     {
                         obj.SetVector(nextPosition);
-                    }
-
-                    
+                    }                    
                 }
+                _spatialGrid.Update(obj);
 
             }
             else if (velocity.X > 0)
@@ -514,7 +532,6 @@ namespace SuperTanks.Core
                     if (nextPosition.Y < edgeTop || Math.Abs(difference) < Math.Abs(movement.Y))
                     {
                         obj.SetVector(new Vector2(obj.GetVector().X, edgeTop));
-                        _spatialGrid.Update(obj);
                     }
                     else
                     {
@@ -558,7 +575,6 @@ namespace SuperTanks.Core
                     if (nextPosition.Y > edgeBottom || difference < movement.Y)
                     {
                         obj.SetVector(new Vector2(obj.GetVector().X, edgeBottom));
-                        _spatialGrid.Update(obj);
                     }
                     else
                     {
@@ -573,5 +589,104 @@ namespace SuperTanks.Core
 
         }
 
+        internal void MakeBoost()
+        {
+            Boost boost;
+            Rectangle safeRect = new Rectangle(_eagleRect.X - _tileSize, _eagleRect.Y - _tileSize, _eagleRect.Width + 2 * _tileSize, _eagleRect.Height + _tileSize);
+            Random r = new();
+
+            do
+            {
+                int x = r.Next(GetEdgeLeft(), GetEdgeRight(_tileSize) + 1);
+                int y = r.Next(GetEdgeTop(), GetEdgeBottom(_tileSize) + 1);
+                boost = EntityFactory.CreateBoost(new Vector2(x, y), BoostTypeHelper.GetRandom());
+            }
+            while (boost.Bounds(boost.GetVector()).Intersects(safeRect));
+
+            if (_activeBoosts.Count <_totalBoosts)
+            {
+                _activeBoosts.Add(boost);
+            }
+            else
+            {
+                _toRemove.Add(_activeBoosts[0]);
+                _activeBoosts.RemoveAt(0);
+                _activeBoosts.Add(boost);
+            }
+
+            _toAdd.Add(boost);
+
+        }
+
+        internal void CheckBoost(LivingObject livingObject)
+        {
+            Rectangle livingRect = livingObject.Bounds(livingObject.GetVector());
+            List<GameObject> nearby = _spatialGrid.GetNearby(livingRect);
+
+            foreach (var other in nearby)
+            {
+                if (other is Boost boost)
+                {
+                    Rectangle otherRect = other.Bounds(other.GetVector());
+                    if (otherRect.Intersects(livingRect))
+                    {
+                        Rectangle intersection = Rectangle.Intersect(otherRect, livingRect);
+                        float intersectionArea = intersection.Width * intersection.Height;
+                        float boostArea = other.GetSizeX() * other.GetSizeY();
+                        float overlap = intersectionArea / boostArea;
+                        if (overlap >= 0.5f)
+                        {
+                            if (boost.GetBoostType() == BoostType.Spade)
+                            {
+                                HandleSpadeBoost();
+                            }
+                            livingObject.HandleBoost(boost.GetBoostType());
+                            _toRemove.Add(other);
+                        }
+                    }
+                }
+
+            }
+        }
+
+        private void HandleSpadeBoost()
+        {
+            int areaSize = 10;
+            Rectangle expandedRect = new Rectangle(_eagleRect.X - _tileSize, _eagleRect.Y - _tileSize, _eagleRect.Width + 2 * _tileSize, _eagleRect.Height + _tileSize);
+
+            for (int x = expandedRect.Left; x < expandedRect.Right; x += areaSize)
+            {
+                for (int y = expandedRect.Top; y < expandedRect.Bottom; y += areaSize)
+                {
+                    Rectangle areaRect = new Rectangle(x, y, areaSize, areaSize);
+
+                    List<GameObject> nearbyFromArea = _spatialGrid.GetNearby(areaRect);
+
+                    bool eagle = false;
+
+                    foreach (var item in nearbyFromArea)
+                    {
+                        if (item is ObjectArea area)
+                        {
+                            if (area.GetAreaType() != AreaType.EAGLE)
+                            {
+                                _toRemove.Add(area);
+                            }
+                            else
+                            {
+                                eagle = true;
+                            }
+
+                        }
+
+                    }
+                    if (!eagle)
+                    {
+                        _toAdd.Add(EntityFactory.CreateArea(new Vector2(x, y), AreaType.ROCK));
+                    }
+
+                }
+            }
+        }
     }
 }
