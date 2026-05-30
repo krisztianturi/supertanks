@@ -4,6 +4,8 @@ using SuperTanks.Overlays;
 using SuperTanks.Systems;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,7 +32,7 @@ namespace SuperTanks.Core
         private SpatialGrid _spatialGrid;
         private Player _player1;
         private Rectangle _eagleRect;
-        private Rectangle[] _enemyRects = new Rectangle[2];
+        private Rectangle[] _enemyRects = new Rectangle[3];
 
         internal Player GetPlayer1() { return _player1; }
         
@@ -100,7 +102,6 @@ namespace SuperTanks.Core
 
         private void GenerateSinglePlayerMap()
         {
-            int counter = 0;
             Random random = new Random();
             for (int x = 0; x < _countX-1; x++)
             {
@@ -109,39 +110,33 @@ namespace SuperTanks.Core
                     int pixelX =_edgeSize + x * _tileSize;
                     int pixelY = _edgeSize + y * _tileSize;
 
-                    //if ((x == 0 && y == 0))
-                    if ((x == 0 && y == 0) || (x == _countX - 2 && y == 0))
-                    {
-                        Enemy enemy = EntityFactory.CreateEnemy(new Vector2(pixelX, pixelY), 1, 1);
-                        gameObjects.Add(enemy);
-                        _spatialGrid.Add(enemy);
-
-                        pixelX += enemy.GetSizeX();
-                        pixelY += enemy.GetSizeY();
-                        _enemyRects[counter] = enemy.Bounds(enemy.GetVector());
-                        counter++;
-                        continue;
-                    }
-
                     if (y==0)
                     {
                         continue;
                     }
 
-                    if ((x == 0 && y == 1) || (x == _countX-2 && y==1))
+                    if ((x == 0 && y == 1) || (x == _countX - 2 && y == 1))
                     {
                         CreateTile(pixelX, pixelY, AreaType.ROCK);
                         continue;
 
                     }
-
-                    if (y == 1) 
+                    if (y==1)
                     {
-                        CreateTile(pixelX, pixelY, AreaType.WALL);
                         continue;
                     }
 
-                    if ((x == (_countX - 1) / 2 - 1 && y == _countY - 2) || (x == (_countX - 1) / 2 +1 && y == _countY - 2) ||
+                    if (y == 2)
+                    {
+                        if (x == (_countX - 1) / 2 - 1 || x == (_countX - 1) / 2 + 1 || x == (_countX - 1) / 2)
+                        {
+                            CreateTile(pixelX, pixelY, AreaType.ROCK);
+                        }
+                        else CreateTile(pixelX, pixelY, AreaType.WALL);
+                        continue;
+                    }
+
+                    if ((x == (_countX - 1) / 2 - 1 && y == _countY - 2) || (x == (_countX - 1) / 2 + 1 && y == _countY - 2) ||
                         (x == (_countX - 1) / 2 - 1 && y == _countY - 3) || (x == (_countX - 1) / 2 + 1 && y == _countY - 3) || (x == (_countX - 1) / 2 && y == _countY - 3)
                         )
                     {
@@ -169,12 +164,26 @@ namespace SuperTanks.Core
                     }
 
                     double randomNum = random.NextDouble();
-                    if (randomNum < 0.1)
+                    if (randomNum < 0.3)
                     {
-                        CreateTile(pixelX, pixelY, AreaTypeHelper.GetRandom());
+                        CreateTile(pixelX, pixelY, EnumRandomizer.GetRandomExcept<AreaType>(AreaType.EAGLE));
                     }
                 }
             }
+
+            GenerateEnemy(_edgeSize, _edgeSize, 0);
+            GenerateEnemy(_edgeSize+ (((_countX - 1) / 2)*_tileSize), _edgeSize, 1);
+            GenerateEnemy(_edgeSize + ((_countX - 2) * _tileSize), _edgeSize, 2);
         }
+
+        private void GenerateEnemy(float pixelX, float pixelY, int number)
+        {
+            Enemy enemy = EntityFactory.CreateEnemy(new Vector2(pixelX, pixelY), 1, 1, EnumRandomizer.GetRandom<MoveType>(), EnumRandomizer.GetRandom<SpeedType>());
+            //Enemy enemy = EntityFactory.CreateEnemy(new Vector2(pixelX, pixelY), 1, 1, MoveType.Follower, SpeedType.Various);
+            gameObjects.Add(enemy);
+            _spatialGrid.Add(enemy);
+            _enemyRects[number] = enemy.Bounds(enemy.GetVector());
+        }
+
     }
 }

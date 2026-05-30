@@ -69,6 +69,11 @@ namespace SuperTanks.Systems
             _sb.Draw(_pixel, rect, color);
         }
 
+        internal void DrawPixelRectWithoutOffset(Rectangle rect, Color color)
+        {
+            _sb.Draw(_pixel, rect, color);
+        }
+
         internal void DrawPixelRectDepth(Rectangle rect, Color color)
         {
             rect.X += (int)_offset.X;

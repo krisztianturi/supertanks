@@ -13,14 +13,4 @@ namespace SuperTanks.Core
         Left,
         Right
     }
-
-    static class DirectionHelper
-    {
-        private static Random random = new Random();
-
-        public static Direction GetRandom()
-        {
-            return (Direction)random.Next(Enum.GetValues(typeof(Direction)).Length);
-        }
-    }
 }

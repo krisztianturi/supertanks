@@ -20,13 +20,17 @@ namespace SuperTanks.Core
         private List<GameObject> _toRemove = new List<GameObject>();
         private List<GameObject> _toAdd = new List<GameObject>();
 
-        private bool _isGameOver = false;
+        private bool? _isGameLost;
         private readonly int _tileSize = 100;
         private Rectangle _eagleRect;
         private Rectangle[] _enemyRects;
-        private int _totalEnemies = 8;
+        private int _totalEnemiesLeft = 3;
+        private int _numberOfEnemies;
         private static int _totalBoosts = 3;
         private List<Boost> _activeBoosts = new();
+        private List<Boost> _toRemoveBoosts = new();
+
+        private Dictionary<(MoveType, SpeedType), int> _kills = new();
 
 
         internal static void SetEdges(int left, int right, int top, int bottom)
@@ -42,6 +46,7 @@ namespace SuperTanks.Core
             this._spatialGrid = _spatialGrid;
             _eagleRect = eagle;
             _enemyRects = enemyRects;
+            _numberOfEnemies = _enemyRects.Length + _totalEnemiesLeft;
         }
 
         internal static int GetEdgeLeft() {  return _edgeLeft; }
@@ -74,30 +79,52 @@ namespace SuperTanks.Core
             }
             _toAdd.Clear();
 
+
+            foreach (var item in _toRemoveBoosts)
+            {
+                _activeBoosts.Remove(item);
+            }
+            _toRemoveBoosts.Clear();
+
             GameStateChange();
         }
 
         private void GameStateChange()
         {
-            if (_isGameOver)
-            {
-                TheGameIsLost();
-            }
-            else if (InputManager.ExitPressed())
+            if (InputManager.ExitPressed())
             {
                 OverlayManager.RequestChange(new MenuOverlay());
                 ClosingGame();
+            }else if (_isGameLost!=null)
+            {
+                if (_isGameLost==true)
+                {
+                    TheGameIsLost();
+                }
+                else
+                {
+                    TheGameIsWon();
+                }
             }
+
+
+
         }
 
         internal void SetGameOver()
         {
-            _isGameOver = true;
+            _isGameLost = true;
         }
 
         private void TheGameIsLost()
         {
-            OverlayManager.RequestChange(new GameOverOverlay());
+            OverlayManager.RequestChange(new GameOverOverlay(false));
+            ClosingGame();
+        }
+
+        private void TheGameIsWon()
+        {
+            OverlayManager.RequestChange(new GameOverOverlay(true, _kills));
             ClosingGame();
         }
 
@@ -107,6 +134,7 @@ namespace SuperTanks.Core
             _toAdd.Clear();
             _toRemove.Clear();
             _spatialGrid = null;
+            EntityFactory.Clear();
         }
 
         internal void Draw(Renderer renderer)
@@ -127,17 +155,34 @@ namespace SuperTanks.Core
             _objects.Add(go);
         }
 
-        internal void RemoveEnemy(GameObject o) 
-        { 
+        internal void RemoveEnemy(Enemy o) 
+        {
+            _numberOfEnemies--;
             _toRemove.Add(o);
+
+            var key = (o.GetMoveType(), o.GetSpeedType());
+
+            if (_kills.ContainsKey(key))
+            {
+                _kills[key]++;
+            }
+            else
+            {
+                _kills[key] = 1;
+            }
+
             Random r = new();
-            if (_totalEnemies!=0)
+            if (_totalEnemiesLeft!=0)
             {
                 int index = r.Next(_enemyRects.Length);
                 Rectangle enemyRect = _enemyRects[index];
-                Enemy enemy = EntityFactory.CreateEnemy(new Vector2(enemyRect.X, enemyRect.Y),1,2);
+                Enemy enemy = EntityFactory.CreateEnemy(new Vector2(enemyRect.X, enemyRect.Y),1,2, EnumRandomizer.GetRandom<MoveType>(), EnumRandomizer.GetRandom<SpeedType>());
                 _toAdd.Add(enemy);
-                _totalEnemies--;
+                _totalEnemiesLeft--;
+            }
+            else if(_numberOfEnemies==0)
+            {
+                _isGameLost = false;
             }
 
 
@@ -258,7 +303,7 @@ namespace SuperTanks.Core
                         {
                             if (area.GetAreaType() == AreaType.EAGLE)
                             {
-                                _isGameOver = true;
+                                _isGameLost = true;
                                 _toRemove.Add(target);
                             }
                             else if(area.GetAreaType() == AreaType.WALL || (area.GetAreaType() == AreaType.ROCK && projectile.GetPower()>2) || (area.GetAreaType() == AreaType.GRASS && projectile.GetPower() > 5))
@@ -642,7 +687,7 @@ namespace SuperTanks.Core
             {
                 int x = r.Next(GetEdgeLeft(), GetEdgeRight(_tileSize) + 1);
                 int y = r.Next(GetEdgeTop(), GetEdgeBottom(_tileSize) + 1);
-                boost = EntityFactory.CreateBoost(new Vector2(x, y), BoostTypeHelper.GetRandom());
+                boost = EntityFactory.CreateBoost(new Vector2(x, y), EnumRandomizer.GetRandom<BoostType>());
             }
             while (boost.Bounds(boost.GetVector()).Intersects(safeRect));
 
@@ -681,10 +726,18 @@ namespace SuperTanks.Core
                         {
                             if (boost.GetBoostType() == BoostType.Spade)
                             {
-                                HandleSpadeBoost();
+                                if (livingObject is Player) HandleSpadeBoost();
                             }
                             livingObject.HandleBoost(boost.GetBoostType());
+
                             _toRemove.Add(other);
+                            foreach (var item in _activeBoosts)
+                            {
+                                if (item.Equals(other))
+                                {
+                                    _toRemoveBoosts.Add(item);
+                                }
+                            }
                         }
                     }
                 }

@@ -99,14 +99,4 @@ namespace SuperTanks.Entities
         ICE,
         EAGLE          
     }
-
-    static class AreaTypeHelper
-    {
-        private static Random random = new Random();
-
-        public static AreaType GetRandom()
-        {
-            return (AreaType)random.Next(Enum.GetValues(typeof(AreaType)).Length-1);
-        }
-    }
 }

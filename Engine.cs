@@ -21,7 +21,7 @@ namespace SuperTanks
             _screenWidth = _graphics.PreferredBackBufferWidth = dm.Width;
             _screenHeight = _graphics.PreferredBackBufferHeight = dm.Height;
 
-            _graphics.IsFullScreen = false;
+            _graphics.IsFullScreen = true;
             _graphics.ApplyChanges();
 
             Content.RootDirectory = "Content";

@@ -5,6 +5,16 @@ using SuperTanks.Systems;
 
 namespace SuperTanks.Entities
 {
+
+    internal enum BoostType
+    {
+        Life,
+        Star,
+        Gun,
+        Spade,
+        Ship
+    }
+
     internal class Boost : GameObject
     {
         private BoostType _boostType;
