@@ -8,6 +8,26 @@ using SuperTanks.Systems;
 
 namespace SuperTanks.Entities
 {
+    internal class PlayerInput
+    {
+        internal Keys Left { get; }
+        internal Keys Right { get; }
+        internal Keys Up { get; }
+        internal Keys Down { get; }
+        internal Keys Fire { get; }
+
+        internal PlayerInput (Keys left, Keys right, Keys up, Keys down, Keys fire)
+        {
+            Left = left;
+            Right = right;
+            Up = up;
+            Down = down;
+            Fire = fire;            
+        }
+
+    }
+
+
     internal class Player : LivingObject
     {
 
@@ -18,17 +38,21 @@ namespace SuperTanks.Entities
         private Vector2 _originPosition;
         private Texture2D _up, _down, _left, _right, _currentImg;
 
-        internal Player(Texture2D up, Texture2D down, Texture2D left, Texture2D right, Vector2 vector, int sizeX, int sizeY, bool blocking, bool shootable, int power, int vitality, Animation animation) : base(up, down, left, right, vector, sizeX, sizeY, blocking, shootable, power,vitality,animation)
+        private PlayerInput _input;
+
+        internal Player(Texture2D up, Texture2D down, Texture2D left, Texture2D right, Vector2 vector, int sizeX, int sizeY, bool blocking, bool shootable,bool ship, int power, int vitality, Animation animation, PlayerInput input) : base(up, down, left, right, vector, sizeX, sizeY, blocking, shootable, power, vitality, animation)
         {
             _currentImg = up;
-           _originPosition = new Vector2(vector.X, vector.Y);
+            HasShip = ship;
+            _originPosition = new Vector2(vector.X, vector.Y);
+            _input = input;
         }
 
         internal override void Update(GameTime gameTime, GameManager gm)
         {
             Move(gameTime, gm);
             double currentTime = gameTime.TotalGameTime.TotalMilliseconds;
-            if (InputManager.IsDown(Keys.Space) && currentTime > _shootingTime+_holdProjectile)
+            if (InputManager.IsDown(_input.Fire) && currentTime > _shootingTime+_holdProjectile)
             {
                 gm.Shooting(this);
                 _shootingTime = gameTime.TotalGameTime.TotalMilliseconds;
@@ -55,25 +79,25 @@ namespace SuperTanks.Entities
         {
             Vector2 velocity = Vector2.Zero;
 
-            if (InputManager.IsDown(Keys.Up))
+            if (InputManager.IsDown(_input.Up))
             {
                 base.SetDirection(Direction.Up);
                 velocity.Y -= 1;
                 base.SetCurrentImg(base.GetUpImg());
             }
-            else if (InputManager.IsDown(Keys.Down))
+            else if (InputManager.IsDown(_input.Down))
             {
                 base.SetDirection(Direction.Down);
                 velocity.Y += 1;
                 base.SetCurrentImg(base.GetDownImg());
             }
-            else if (InputManager.IsDown(Keys.Left))
+            else if (InputManager.IsDown(_input.Left))
             {
                 base.SetDirection(Direction.Left);
                 velocity.X -= 1;
                 base.SetCurrentImg(base.GetLeftImg());
             }
-            else if (InputManager.IsDown(Keys.Right))
+            else if (InputManager.IsDown(_input.Right))
             {
                 base.SetDirection(Direction.Right);
                 velocity.X += 1;

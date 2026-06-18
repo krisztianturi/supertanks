@@ -6,20 +6,17 @@ using SuperTanks.Systems;
 
 namespace SuperTanks.Overlays
 {
-    internal class SinglePlayerOverlay : IOverlay
+    internal class MultiPlayerOverlay : IOverlay
     {
-
+        private GameManager _gameManager;
         private static int _edgeSize;
         private static int _drawSizeX, _drawSizeY;
         private static Rectangle[] _edges;
 
-        private GameManager _gameManager;
-
-        internal SinglePlayerOverlay()
+        internal MultiPlayerOverlay()
         {
-            _gameManager = GameCreator.Instance.CreateSinglePlayerGame();
+            _gameManager = GameCreator.Instance.CreateMultiPlayerGame();
         }
-
 
         public void Update(GameTime gameTime)
         {
@@ -49,18 +46,22 @@ namespace SuperTanks.Overlays
             }
 
             renderer.DrawPixelRect(new Rectangle(_drawSizeX, 0, GameCreator._displaySize, _drawSizeY), Color.Gray);
+
+
             Player player = GameCreator.Instance.GetPlayer1();
+            renderer.DrawPixelRect(new Rectangle(_drawSizeX, 0, GameCreator._displaySize, _drawSizeY), Color.Gray);
+            renderer.DrawPixelRectWithDepth(new Rectangle((int)_drawSizeX, (int)_drawSizeY / 2, GameCreator._displaySize, 2), Color.Black,0.1f);
 
             float placeX = renderer.GetStringSize("Player 1: ").X;
             float placeY = renderer.GetStringSize("Player 1: ").Y;
             float destinationX = _drawSizeX + GameCreator._displaySize / 2 - placeX / 2;
-            float destinationY = (0 + _drawSizeY / 8) / 2 - placeY / 2;
+            float destinationY = (0+ _drawSizeY / 8)/2 - placeY / 2;
 
             renderer.DrawString("Player 1", new Vector2(destinationX, destinationY), Color.Blue, 1.5f);
 
             placeX = renderer.GetStringSize("Power: " + player.GetPower()).X;
             destinationX = _drawSizeX + GameCreator._displaySize / 2 - placeX / 2;
-            destinationY = ((_drawSizeY / 8) + (2 * (_drawSizeY / 8))) / 2 - placeY / 2;
+            destinationY = ((_drawSizeY / 8) + (2 * (_drawSizeY / 8)))/2 - placeY / 2;
 
             int power = player.GetPower() + 1;
             renderer.DrawString("Power: " + power, new Vector2(destinationX, destinationY), Color.Blue, 1);
@@ -68,7 +69,7 @@ namespace SuperTanks.Overlays
             placeX = renderer.GetStringSize("Life: " + player.GetVitality()).X;
 
             destinationX = _drawSizeX + GameCreator._displaySize / 2 - placeX / 2;
-            destinationY = (2 * (_drawSizeY / 8) + (3 * (_drawSizeY / 8))) / 2 - placeY / 2;
+            destinationY = (2* (_drawSizeY / 8) + (3 * (_drawSizeY / 8))) / 2 - placeY / 2;
 
             renderer.DrawString("Life: " + player.GetVitality(), new Vector2(destinationX, destinationY), Color.Blue, 1);
 
@@ -76,12 +77,48 @@ namespace SuperTanks.Overlays
             {
                 placeX = renderer.GetStringSize("Ship on!").X;
                 destinationX = _drawSizeX + GameCreator._displaySize / 2 - placeX / 2;
-                destinationY = (3 * (_drawSizeY / 8) + (4 * (_drawSizeY / 8))) / 2 - placeY / 2;
+                destinationY = (3* (_drawSizeY / 8) + (4 * (_drawSizeY / 8))) / 2 - placeY / 2;
                 renderer.DrawString("Ship On! ", new Vector2(destinationX, destinationY), Color.Blue, 1);
             }
 
+
+
+            Player player2 = GameCreator.Instance.GetPlayer2();
+
+            placeX = renderer.GetStringSize("Player 2: ").X;
+            placeY = renderer.GetStringSize("Player 2: ").Y;
+            destinationX = _drawSizeX + GameCreator._displaySize / 2 - placeX / 2;
+            destinationY = (4*(_drawSizeY / 8) + (5 * (_drawSizeY / 8))) / 2 - placeY / 2;
+
+            renderer.DrawString("Player 2", new Vector2(destinationX, destinationY), Color.Blue, 1.5f);
+
+            placeX = renderer.GetStringSize("Power: " + player2.GetPower()).X;
+            destinationX = _drawSizeX + GameCreator._displaySize / 2 - placeX / 2;
+            destinationY = (5 * (_drawSizeY / 8) + (6 * (_drawSizeY / 8))) / 2 - placeY / 2;
+
+            power = player2.GetPower() + 1;
+            renderer.DrawString("Power: " + power, new Vector2(destinationX, destinationY), Color.Blue, 1);
+
+            placeX = renderer.GetStringSize("Life: " + player2.GetVitality()).X;
+
+            destinationX = _drawSizeX + GameCreator._displaySize / 2 - placeX / 2;
+            destinationY = (6 * (_drawSizeY / 8) + (7 * (_drawSizeY / 8))) / 2 - placeY / 2;
+
+            renderer.DrawString("Life: " + player.GetVitality(), new Vector2(destinationX, destinationY), Color.Blue, 1);
+
+            if (player2.HasShip)
+            {
+                placeX = renderer.GetStringSize("Ship on!").X;
+                destinationX = _drawSizeX + GameCreator._displaySize / 2 - placeX / 2;
+                destinationY = (7 * (_drawSizeY / 8) + (8 * (_drawSizeY / 8))) / 2 - placeY / 2;
+                renderer.DrawString("Ship On! ", new Vector2(destinationX, destinationY), Color.Blue, 1);
+            }
+
+
+
             _gameManager.Draw(renderer);
         }
+
 
         internal static void SetEdgeSize(int edgeSize, int drawSizeX, int drawSizeY)
         {
@@ -103,7 +140,5 @@ namespace SuperTanks.Overlays
 
             return frames;
         }
-
-
     }
 }

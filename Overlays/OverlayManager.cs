@@ -10,6 +10,8 @@ namespace SuperTanks.Overlays
         private static IOverlay _current;
         private static IOverlay _next;
 
+        private static IOverlay _previous;
+
         private static Action _onExit;
 
         private OverlayManager() { }
@@ -25,6 +27,7 @@ namespace SuperTanks.Overlays
 
             if (_next != null)
             {
+                _previous = _current;
                 _current = _next;
                 _next = null;
             }
@@ -37,6 +40,7 @@ namespace SuperTanks.Overlays
 
         internal static void SetOnExit(Action action) { _onExit = action; }
         internal static Action GetExitAction() { return _onExit; }
+        internal static IOverlay GetPrevious() { return _previous; }
         internal static void SetCurrentOverlay(IOverlay overlay) 
         {
             if (_current != null)

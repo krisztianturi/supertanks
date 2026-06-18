@@ -21,7 +21,7 @@ namespace SuperTanks
             _screenWidth = _graphics.PreferredBackBufferWidth = dm.Width;
             _screenHeight = _graphics.PreferredBackBufferHeight = dm.Height;
 
-            _graphics.IsFullScreen = true;
+            _graphics.IsFullScreen = false;
             _graphics.ApplyChanges();
 
             Content.RootDirectory = "Content";
@@ -75,6 +75,10 @@ namespace SuperTanks
 
             Assets._invulnerable[0] = Content.Load<Texture2D>("images/invulne1");
             Assets._invulnerable[1] = Content.Load<Texture2D>("images/invulne2");
+
+            Assets._arrow = Content.Load<Texture2D>("images/arrow");
+            Assets._title = Content.Load<Texture2D>("images/title");
+            Assets._menuOptions = Content.Load<Texture2D>("images/menuOptions");
 
 
             Renderer.SetFont(Content.Load<SpriteFont>("File"));

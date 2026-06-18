@@ -14,6 +14,7 @@
     <Optimize>False</Optimize>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Content\images\arrow.png" />
     <None Remove="Content\images\boostGun.png" />
     <None Remove="Content\images\boostLife.png" />
     <None Remove="Content\images\boostShip.png" />
@@ -33,11 +34,13 @@
     <None Remove="Content\images\invulne1.png" />
     <None Remove="Content\images\invulne2.png" />
     <None Remove="Content\images\left.png" />
+    <None Remove="Content\images\menuOptions.png" />
     <None Remove="Content\images\projectile.png" />
     <None Remove="Content\images\right.png" />
     <None Remove="Content\images\rock.png" />
     <None Remove="Content\images\test.jpg" />
     <None Remove="Content\images\testProj.png" />
+    <None Remove="Content\images\title.png" />
     <None Remove="Content\images\up.png" />
     <None Remove="Content\images\wall.png" />
     <None Remove="Content\images\water.png" />
@@ -45,6 +48,9 @@
     <None Remove="Icon.bmp" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\images\arrow.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\images\boostGun.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -102,6 +108,9 @@
     <Content Include="Content\images\left.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\images\menuOptions.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\images\projectile.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -115,6 +124,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\images\testProj.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\images\title.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\images\up.png">

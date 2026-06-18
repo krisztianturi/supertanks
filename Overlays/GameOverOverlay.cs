@@ -2,6 +2,7 @@
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using SuperTanks.Core;
 using SuperTanks.Entities;
 using SuperTanks.Systems;
 using System.Collections.Generic;
@@ -29,6 +30,7 @@ namespace SuperTanks.Overlays
         private bool _won;
         private List<StatisticRow> _rows = new();
         private readonly int _totalEnemies;
+        private bool init;
 
         internal GameOverOverlay(bool won)
         {
@@ -38,6 +40,7 @@ namespace SuperTanks.Overlays
         internal GameOverOverlay(bool won, Dictionary<(MoveType, SpeedType), int> kills)
         {
             _won= won;
+
             foreach (var item in kills)
             {
                 _rows.Add(new StatisticRow(item.Value, item.Key.Item1, item.Key.Item2));
@@ -48,13 +51,46 @@ namespace SuperTanks.Overlays
 
         public void Update(GameTime gameTime)
         {
+            if (!init)
+            {
+                if (!_won)
+                {
+                    Status.Reset();
+                }
+                else
+                {
+                    if (OverlayManager.GetPrevious() is SinglePlayerOverlay)
+                    {
+                        Player p = GameCreator.Instance.GetPlayer1();
+                        Status.SetPlayer1(p.GetPower(), p.GetVitality(), p.HasShip);
+                    }
+                    else
+                    {
+                        Player p = GameCreator.Instance.GetPlayer1();
+                        Status.SetPlayer1(p.GetPower(), p.GetVitality(), p.HasShip);
+                        Player p2 = GameCreator.Instance.GetPlayer2();
+                        Status.SetPlayer1(p2.GetPower(), p2.GetVitality(), p2.HasShip);
+                    }
+                }
+                init = true;
+            }
+
+
             if (InputManager.ExitPressed())
             {
                 OverlayManager.RequestChange(new MenuOverlay());
             }
             if (InputManager.ConfirmPressed())
             {
-                OverlayManager.RequestChange(new SinglePlayerOverlay());
+                if (OverlayManager.GetPrevious() is SinglePlayerOverlay)
+                {
+                    OverlayManager.RequestChange(new SinglePlayerOverlay());
+                }
+                else
+                {
+                    OverlayManager.RequestChange(new MultiPlayerOverlay());
+                }
+
 
             }
         }

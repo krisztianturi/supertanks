@@ -9,6 +9,7 @@ using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Xna.Framework.Input;
 
 namespace SuperTanks.Core
 {
@@ -30,12 +31,13 @@ namespace SuperTanks.Core
 
         private List<GameObject> gameObjects;
         private SpatialGrid _spatialGrid;
-        private Player _player1;
+        private Player _player1, _player2;
         private Rectangle _eagleRect;
         private Rectangle[] _enemyRects = new Rectangle[3];
 
         internal Player GetPlayer1() { return _player1; }
-        
+        internal Player GetPlayer2() { return _player2; }
+
 
         static GameCreator()
         {
@@ -59,6 +61,7 @@ namespace SuperTanks.Core
 
             GameManager.SetEdges(_edgeSize, _drawSizeX - _edgeSize, _edgeSize, _drawSizeY - _edgeSize);
             SinglePlayerOverlay.SetEdgeSize(_edgeSize, _drawSizeX, _drawSizeY);
+            MultiPlayerOverlay.SetEdgeSize(_edgeSize, _drawSizeX, _drawSizeY);
             Renderer.Offset = new Vector2(_restX / 2, _restY / 2);
             SpatialGrid.SetOrigin(_edgeSize, _edgeSize);
         }
@@ -67,13 +70,37 @@ namespace SuperTanks.Core
         {
         }
 
+        internal GameManager CreateMultiPlayerGame()
+        {
+            gameObjects = new List<GameObject>();
+            _spatialGrid = new SpatialGrid(_tileSize);
 
+            float pX = _edgeSize + ((_countX - 1) / 2 - 2) * _tileSize;
+            float pY = _edgeSize + (_countY - 2) * _tileSize;
+            _player1 = EntityFactory.CreatePlayer(new Vector2(pX, pY), new PlayerInput(Keys.A, Keys.D, Keys.W, Keys.S, Keys.LeftControl), Status.GetShip1(), Status.GetPower1(), Status.GetVitality1());
+            pX = _edgeSize + ((_countX - 1) / 2 + 2) * _tileSize;
+            _player2 = EntityFactory.CreatePlayer(new Vector2(pX, pY), new PlayerInput(Keys.Left, Keys.Right, Keys.Up, Keys.Down, Keys.Space), Status.GetShip2(), Status.GetPower2(), Status.GetVitality2());
+
+            GenerateMapWithEnemies();
+            GameManager gameManager = new GameManager(_spatialGrid, _eagleRect, _enemyRects);
+            gameManager.AddObject(_player1);
+            _spatialGrid.Add(_player1);
+            gameManager.AddObject(_player2);
+            _spatialGrid.Add(_player2);
+            gameManager.AddObjects(gameObjects);
+            return gameManager;
+        }
 
         internal GameManager CreateSinglePlayerGame()
         {
             gameObjects = new List<GameObject>();
             _spatialGrid = new SpatialGrid(_tileSize);
-            GenerateSinglePlayerMap();
+
+            float pX = _edgeSize + ((_countX - 1) / 2 - 2) * _tileSize;
+            float pY = _edgeSize + (_countY - 2) * _tileSize;
+            _player1 = EntityFactory.CreatePlayer(new Vector2(pX, pY), new PlayerInput(Keys.Left, Keys.Right, Keys.Up, Keys.Down, Keys.Space), Status.GetShip1(), Status.GetPower1(), Status.GetVitality1());
+
+            GenerateMapWithEnemies();
             GameManager gameManager = new GameManager(_spatialGrid,_eagleRect, _enemyRects);
             gameManager.AddObject(_player1);
             _spatialGrid.Add(_player1);
@@ -100,7 +127,7 @@ namespace SuperTanks.Core
             }
         }
 
-        private void GenerateSinglePlayerMap()
+        private void GenerateMapWithEnemies()
         {
             Random random = new Random();
             for (int x = 0; x < _countX-1; x++)
@@ -144,11 +171,8 @@ namespace SuperTanks.Core
                         continue;
                     }
 
-                    if (x == (_countX - 1) / 2 -2 && y == _countY - 2)
+                    if ((x == (_countX - 1) / 2 - 2 || (x == (_countX - 1) / 2 + 2) && y == _countY - 2))
                     {
-                        _player1 = EntityFactory.CreatePlayer(new Vector2(pixelX,pixelY));
-                        pixelX += _player1.GetSizeX();
-                        pixelY += _player1.GetSizeY();
                         continue;
                     }
 
@@ -169,7 +193,7 @@ namespace SuperTanks.Core
                         CreateTile(pixelX, pixelY, EnumRandomizer.GetRandomExcept<AreaType>(AreaType.EAGLE));
                     }
                 }
-            }
+            }        
 
             GenerateEnemy(_edgeSize, _edgeSize, 0);
             GenerateEnemy(_edgeSize+ (((_countX - 1) / 2)*_tileSize), _edgeSize, 1);
@@ -184,6 +208,7 @@ namespace SuperTanks.Core
             _spatialGrid.Add(enemy);
             _enemyRects[number] = enemy.Bounds(enemy.GetVector());
         }
+
 
     }
 }

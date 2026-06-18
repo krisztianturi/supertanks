@@ -62,6 +62,13 @@ namespace SuperTanks.Systems
             _sb.Draw(tex, centerPos + _offset, null, color, rotation, origin, scale, SpriteEffects.None, 0f);
         }
 
+        internal void DrawPixelRectWithDepth(Rectangle rect, Color color, float depth)
+        {
+            rect.X += (int)_offset.X;
+            rect.Y += (int)_offset.Y;
+            _sb.Draw(_pixel, rect,null, color,0f,Vector2.Zero,SpriteEffects.None,depth);
+        }
+
         internal void DrawPixelRect(Rectangle rect, Color color)
         {
             rect.X += (int)_offset.X;
@@ -86,6 +93,16 @@ namespace SuperTanks.Systems
             rect.X += (int)_offset.X;
             rect.Y += (int)_offset.Y;
             _sb.Draw(tex, rect, color);
+        }
+
+        internal void DrawRectWithoutOffset(Texture2D tex, Rectangle rect)
+        {
+            _sb.Draw(tex, rect, Color.White);
+        }
+
+        internal void DrawVectorWithoutOffset(Texture2D tex, Vector2 v)
+        {
+            _sb.Draw(tex, v, Color.White);
         }
 
         internal void DrawWithRect(Texture2D tex, Vector2 vector, Rectangle rect, Color color)

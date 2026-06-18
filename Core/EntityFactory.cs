@@ -36,9 +36,9 @@ namespace SuperTanks.Core
             
         }
 
-        internal static Player CreatePlayer(Vector2 vector)
+        internal static Player CreatePlayer(Vector2 vector,PlayerInput input, bool ship, int power, int vitality)
         {
-            Player player = new Player(Assets._up, Assets._down, Assets._left, Assets._right, vector, _tileSize, _tileSize, false, true,5,3, new Animation(Assets._invulnerable));
+            Player player = new Player(Assets._up, Assets._down, Assets._left, Assets._right, vector, _tileSize, _tileSize, false, true,ship, power, vitality, new Animation(Assets._invulnerable), input);
             _getTargetVectors.Add(player.GetVector);
             return player;
         }
